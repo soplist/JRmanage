@@ -1,0 +1,96 @@
+package com.bureau.pojo;
+
+import java.sql.Timestamp;
+
+/**
+ * Log entity. @author MyEclipse Persistence Tools
+ */
+
+public class Log implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private QUser user;
+	private String logDate;
+	private String logText;
+	private Integer logDone;
+	
+	//分页属性,不做映射
+	private Integer page;//表示当前是第几页
+	private Integer rows;//每页显示多少条记录
+	
+	
+	// Constructors
+
+	public Integer getPage() {
+		return page;
+	}
+
+	public void setPage(Integer page) {
+		this.page = page;
+	}
+
+	public Integer getRows() {
+		return rows;
+	}
+
+	public void setRows(Integer rows) {
+		this.rows = rows;
+	}
+
+	/** default constructor */
+	public Log() {
+	}
+
+	/** full constructor */
+	public Log(QUser user, String logDate, String logText, Integer logDone) {
+		this.user = user;
+		this.logDate = logDate;
+		this.logText = logText;
+		this.logDone = logDone;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public QUser getUser() {
+		return this.user;
+	}
+
+	public void setUser(QUser user) {
+		this.user = user;
+	}
+
+	public String getLogDate() {
+		return this.logDate;
+	}
+
+	public void setLogDate(String logDate) {
+		this.logDate = logDate;
+	}
+
+	public String getLogText() {
+		return this.logText;
+	}
+
+	public void setLogText(String logText) {
+		this.logText = logText;
+	}
+
+	public Integer getLogDone() {
+		return this.logDone;
+	}
+
+	public void setLogDone(Integer logDone) {
+		this.logDone = logDone;
+	}
+
+}

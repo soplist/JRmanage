@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+<title>综合业务管理系统系统后台登陆</title>
+<link href="./resource/css/login_css/bootstrap.min.css" title="" rel="stylesheet" />
+<link title="orange" href="./resource/css/login_css/login.css" rel="stylesheet" type="text/css"/>
+<script src="./resource/js/jquery.js"></script>
+</head>
+<style type="text/css">
+	body{
+		background-image:url(./resource/img/loginbg1.jpg);
+		background-size:100% 100%;
+	}
+</style>
+
+<body>
+  <div style="height:1px;"></div>
+  <div class="login">
+	 <div class="sr">
+	 	<div style="width: 100%;height:70px;text-align: center;">
+			<span style="font-size: 32px;font-weight:900;display: inline-block;line-height: 45px;font-family:Microsoft YaHei;color: #000000;">综合业务管理系统</span>
+		</div>
+	    <form>
+		    <div class="name">
+				<label>
+				<i class="sublist-icon glyphicon glyphicon-user"></i>
+				</label>
+				<input type="text"  id="lname" name="lname" placeholder="这里输入登录名" class="name_inp">
+			</div>
+			 <div class="name">
+				<label>
+				<i class="sublist-icon glyphicon glyphicon-pencil"></i>
+				</label>
+				<input type="text"  id="lpass" name="lpass" placeholder="这里输入登录密码" class="name_inp">
+			</div>
+			<div id="div-message" style="color: red;display: inline;margin: 2px 0 0 2px;"></div>
+			<button id="btn" class="dl" onclick="btn_login()">登录</button>
+		</form>
+	 </div>
+  </div>
+  <p class="remind" style="text-align: center;color:#FFFFFF;">
+		为了保障您更好的用户体验<br>推荐您使用 <span style="color:yellow;">Chrome，&nbsp;IE10+&nbsp;</span>浏览器来访问本系统
+  </p>
+</body>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	//登录按钮响应方法
+	//$('#btn').bind('click', function(){
+	//	btn_login();
+	//});
+	
+	
+})
+
+$(document).keyup(function(event){
+	if(event.keyCode ==13){
+		btn_login();
+	} 
+});
+
+function btn_login(){
+		var messageDiv = $('#div-message');
+		messageDiv.text('');
+		if($('#lname').val().trim()=="" || $('#lpass').val().trim()==""){
+			 messageDiv.text('请输入用户名或密码');
+		}else{
+			var lname='',lpass='';
+			$.ajax({
+				url:"user_login.action",
+				data:{
+					lname:$('#lname').val(),
+					lpass:$('#lpass').val()
+				},
+				dataType:"json",
+				type:"post",
+				success:function(res){
+					if(res == true){
+					 	window.location.href="forward_url.action?url=main.jsp";		 
+					}else{
+						messageDiv.text('用户名和密码不匹配！');
+					}			
+				}
+			});
+		}
+}		  
+</script>
+		
+</html>

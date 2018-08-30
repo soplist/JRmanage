@@ -1,0 +1,105 @@
+package com.bureau.action;
+
+
+import java.util.List;
+
+import com.bureau.biz.CarrecordBiz;
+import com.bureau.pojo.Carrecord;
+import com.bureau.pojo.Lunch;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class CarrecordAction extends BaseAction implements ModelDriven<Carrecord>{
+	private Carrecord ca;
+	public Carrecord getCa() {
+		return ca;
+	}
+
+	public void setCa(Carrecord ca) {
+		this.ca = ca;
+	}
+
+	public Carrecord getModel() {
+		if(ca==null){
+			ca=new Carrecord();
+		}
+		return ca;
+	}
+	//接收前台参数
+	private String idStart;
+	public void setIdStart(String idStart) {
+		this.idStart = idStart;
+	}
+	public String getIdStart() {
+		return idStart;
+	}
+	private String idEnd;
+	public void setIdEnd(String idEnd) {
+		this.idEnd = idEnd;
+	}
+	public String getIdEnd() {
+		return idEnd;
+	}
+	//注入BIZ
+	private CarrecordBiz carrecordBiz;
+	
+	public void setCarrecordBiz(CarrecordBiz carrecordBiz) {
+		this.carrecordBiz = carrecordBiz;
+	}
+
+	//列表展示
+	public void list(){
+		PageData<Carrecord> tos = carrecordBiz.findAll(ca,idStart,idEnd);	
+		this.writeJSON(tos);
+	}
+	public void findBytime(){
+		List<Carrecord> list = carrecordBiz.findBytime(ca.getCarid(),idStart, idEnd);
+		System.out.println(idEnd+idStart);
+		this.writeJSON(list);
+	}
+	//增加
+	public void add(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		String nowTime = Quarter.getNowTime();
+		ca.setCreatetime(nowTime);
+  		boolean res = carrecordBiz.add(ca);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//修改
+	public void updata(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.UPDFAIL);
+		String nowTime = Quarter.getNowTime();
+		ca.setCreatetime(nowTime);
+		boolean res=carrecordBiz.upd(ca);
+		if(res){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//删除
+	public void del(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.DELFAIL);
+		boolean res = carrecordBiz.del(ca);
+		if(res){
+			tj.setMessage(SysConst.DELSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//根据id查询
+	public void findById(){
+		ca=carrecordBiz.findById(ca.getId());
+		this.writeJSON(ca);
+	}
+}

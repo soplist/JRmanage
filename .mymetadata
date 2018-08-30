@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="JRmanage"
+  id="myeclipse.1533106745435"
+  context-root="/JRmanage"
+  j2ee-spec="5.0"
+  archive="JRmanage.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

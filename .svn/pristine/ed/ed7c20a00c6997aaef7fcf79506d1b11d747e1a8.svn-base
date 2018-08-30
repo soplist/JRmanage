@@ -1,0 +1,151 @@
+package com.bureau.action;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import com.bureau.biz.LogBiz;
+import com.bureau.biz.LunchBiz;
+import com.bureau.pojo.Log;
+import com.bureau.pojo.Lunch;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.QUser;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class LunchAction extends BaseAction implements ModelDriven<Lunch>{
+	//注入LunchBiz
+	private LunchBiz lchBiz;
+	public void setLchBiz(LunchBiz lchBiz) {
+		this.lchBiz = lchBiz;
+	}
+	//注入logBiz
+	private LogBiz logBiz;
+	public void setLogBiz(LogBiz logBiz) {
+		this.logBiz = logBiz;
+	}
+	
+	//传递的实体
+	private Lunch lch;
+	public void setLch(Lunch lch) {
+		this.lch = lch;
+	}
+	public Lunch getLch() {
+		return lch;
+	}
+	
+	//接收前台参数
+	private String idStart;
+	public void setIdStart(String idStart) {
+		this.idStart = idStart;
+	}
+	public String getIdStart() {
+		return idStart;
+	}
+	private String idEnd;
+	public void setIdEnd(String idEnd) {
+		this.idEnd = idEnd;
+	}
+	public String getIdEnd() {
+		return idEnd;
+	}
+	
+	private static PageData<Lunch> pd = null;
+	
+	//查询所有PageData<Lunch>
+	public void findAll(){
+		System.out.println("#######");
+		pd = lchBiz.findAll(lch, idStart, idEnd);
+		this.writeJSON(pd);
+	}
+	
+	//查询所有List<Lunch>
+	public void findBytime(){
+		List<Lunch> list = lchBiz.findBytime(idStart, idEnd);
+		this.writeJSON(list);
+	}
+	
+	//按时间统计报餐人数总数
+	public void sumBytime(){
+		int sum = 0;
+		if(pd != null){
+			for(int i = 0;i < pd.getTotal();i++){
+				sum += pd.getRows().get(i).getSum();
+				
+			}
+		}
+		this.writeJSON(sum);
+	}
+	
+	public void add(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		String nowTime = Quarter.getNowTime01();//添加当前时间
+		lch.setCreatetime(nowTime);
+		boolean res = lchBiz.addLunch(lch);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		//写入日志
+		if(res){
+			//存入日志
+			QUser us = (QUser) session.get("login_users");
+			Log log = new Log();
+			log.setTitle("添加报餐记录！");
+			log.setPeople(us.getLname());
+			//时间
+			Date day=new Date();    
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			log.setCreatetime(df.format(day));
+			log.setIsfinish(1);
+			logBiz.addLog(log);	
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void upd(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.UPDFAIL);
+		boolean res = lchBiz.updLunch(lch);
+		if(res){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void del(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.DELFAIL);
+		boolean res = lchBiz.delLunch(lch);
+		if(res){
+			tj.setMessage(SysConst.DELSUCCESS);
+			tj.setSuccess(true);
+		}
+		//写入日志
+		if(res){
+			//存入日志
+			QUser us = (QUser) session.get("login_users");
+			Log log = new Log();
+			log.setTitle("删除报餐记录信息！");
+			log.setPeople(us.getLname());
+			//时间
+			Date day=new Date();    
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			log.setCreatetime(df.format(day));
+			log.setIsfinish(1);
+			logBiz.addLog(log);	
+		}
+		this.writeJSON(tj);
+	}
+	
+	//ModelDriven
+	public Lunch getModel(){
+		if(lch == null)
+			lch = new Lunch();
+		return lch;
+	}
+}

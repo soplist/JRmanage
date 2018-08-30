@@ -1,0 +1,73 @@
+package com.bureau.pojo;
+
+/**
+ * Goodsout entity. @author MyEclipse Persistence Tools
+ */
+
+public class Goodsout implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String nameid;
+	private Integer peopleid;
+	private Integer num;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Goodsout() {
+	}
+
+	/** full constructor */
+	public Goodsout(String nameid, Integer peopleid, Integer num, String create) {
+		this.nameid = nameid;
+		this.peopleid = peopleid;
+		this.num = num;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getNameid() {
+		return this.nameid;
+	}
+
+	public void setNameid(String nameid) {
+		this.nameid = nameid;
+	}
+
+	public Integer getPeopleid() {
+		return this.peopleid;
+	}
+
+	public void setPeopleid(Integer peopleid) {
+		this.peopleid = peopleid;
+	}
+
+	public Integer getNum() {
+		return this.num;
+	}
+
+	public void setNum(Integer num) {
+		this.num = num;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

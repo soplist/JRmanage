@@ -1,0 +1,18 @@
+package com.bureau.biz;
+
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Privatecar;
+
+
+public interface PrivatecarBiz {
+	//分页查询所有
+	public PageData<Privatecar> findAll(Privatecar pr);
+	//增加
+	public boolean add(Privatecar pr);
+	//修改
+	public boolean upd(Privatecar pr);
+	//删除
+	public boolean del(Privatecar pr);
+	//根据id查询
+	public Privatecar findById(int id);
+}

@@ -1,0 +1,9 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+
+<!-- 用户数据表格 -->
+<table></table>
+<br><br><br>
+&nbsp;&nbsp;使用须知：<br>
+&nbsp;&nbsp;1，新增账号时，密码初始为123456，【启停状态】为【启用】；<br>
+&nbsp;&nbsp;2，如果用户忘记密码，管理员可通过账号后方对应的【重置密码】，将密码初始为123456；<br>

@@ -1,0 +1,156 @@
+package com.bureau.pojo;
+
+/**
+ * Pricarrecord entity. @author MyEclipse Persistence Tools
+ */
+
+public class Pricarrecord implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private Integer pnameid;
+	private Integer jnameid;
+	private String starttime;
+	private Integer startkm;
+	private String endtime;
+	private Integer endkm;
+	private Integer km;
+	private Double money;
+	private String brief;
+	private Integer carid;
+	private String remark;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Pricarrecord() {
+	}
+
+	/** full constructor */
+	public Pricarrecord(Integer pnameid, Integer jnameid, String starttime,
+			Integer startkm, String endtime, Integer endkm, Integer km,
+			Double money, String brief, Integer carid, String remark,
+			String create) {
+		this.pnameid = pnameid;
+		this.jnameid = jnameid;
+		this.starttime = starttime;
+		this.startkm = startkm;
+		this.endtime = endtime;
+		this.endkm = endkm;
+		this.km = km;
+		this.money = money;
+		this.brief = brief;
+		this.carid = carid;
+		this.remark = remark;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getPnameid() {
+		return this.pnameid;
+	}
+
+	public void setPnameid(Integer pnameid) {
+		this.pnameid = pnameid;
+	}
+
+	public Integer getJnameid() {
+		return this.jnameid;
+	}
+
+	public void setJnameid(Integer jnameid) {
+		this.jnameid = jnameid;
+	}
+
+	public String getStarttime() {
+		return this.starttime;
+	}
+
+	public void setStarttime(String starttime) {
+		this.starttime = starttime;
+	}
+
+	public Integer getStartkm() {
+		return this.startkm;
+	}
+
+	public void setStartkm(Integer startkm) {
+		this.startkm = startkm;
+	}
+
+	public String getEndtime() {
+		return this.endtime;
+	}
+
+	public void setEndtime(String endtime) {
+		this.endtime = endtime;
+	}
+
+	public Integer getEndkm() {
+		return this.endkm;
+	}
+
+	public void setEndkm(Integer endkm) {
+		this.endkm = endkm;
+	}
+
+	public Integer getKm() {
+		return this.km;
+	}
+
+	public void setKm(Integer km) {
+		this.km = km;
+	}
+
+	public Double getMoney() {
+		return this.money;
+	}
+
+	public void setMoney(Double money) {
+		this.money = money;
+	}
+
+	public String getBrief() {
+		return this.brief;
+	}
+
+	public void setBrief(String brief) {
+		this.brief = brief;
+	}
+
+	public Integer getCarid() {
+		return this.carid;
+	}
+
+	public void setCarid(Integer carid) {
+		this.carid = carid;
+	}
+
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

@@ -1,0 +1,63 @@
+package com.bureau.pojo;
+
+/**
+ * Lunch entity. @author MyEclipse Persistence Tools
+ */
+
+public class Lunch implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private Integer sum;
+	private String remark;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Lunch() {
+	}
+
+	/** full constructor */
+	public Lunch(Integer sum, String remark, String create) {
+		this.sum = sum;
+		this.remark = remark;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getSum() {
+		return this.sum;
+	}
+
+	public void setSum(Integer sum) {
+		this.sum = sum;
+	}
+
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

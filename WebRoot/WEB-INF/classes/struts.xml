@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<package name="tt" namespace="/" extends="struts-default">
+	    <action name="*_*" class="{1}Action" method="{2}">
+	    	<result name="ok">${path}</result>
+	    </action>
+	    <action name="fileDown" class="com.bureau.action.NoticeAction">
+	    	<result type="stream">
+	    		<param name="inputName">fileInputStream</param>
+	    		<param name="contentDisposition">attachment;filename="${fileName}"</param>
+	    		<param name="contentType">application/octet-stream</param>
+	    		<param name="bufferSize">1024</param>
+	    	</result>
+	    </action>
+	</package>
+</struts>    

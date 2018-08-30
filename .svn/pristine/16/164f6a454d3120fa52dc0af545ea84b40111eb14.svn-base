@@ -1,0 +1,65 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<script type="text/javascript">
+	$(function(){
+	/* 验证session开始 */
+		var curPath = window.document.location.href;
+	 	var pathName = window.document.location.pathname;
+	 	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+	 	var s="<%=session.getAttribute("login_users")%>"; 
+	 	if(s=="null"){ 
+	 		top.location.href = location.href=basePath+"JRmanage";
+	 	}
+		/* 验证session开始 */
+        //加载表格数据
+		$('#dg_softflag').datagrid({    
+	    url:'sf_findAll.action', 
+	    pagination:'true',
+	    singleSelect:'true',//只允许选取一行
+	    fitColumns:true,//宽度自适应  
+	    rownumbers:true,
+	    toolbar: '#tb_softflag',
+	    columns:[[
+	        {checkbox:true},     
+	        {field:'name',title:'项目名称',align:'center',width:8},
+	        {field:'starttime',title:'开始时间',align:'center',width:15},
+	        {field:'endtime',title:'结束时间',align:'center',width:8},
+	        {field:'people',title:'负责人',align:'center',width:6},
+	        {field:'brief',title:'项目简介',align:'center',width:6},
+	        {field:'filename',title:'文件名称',align:'center',width:8},
+	        {field:'peopleid',title:'记录人',align:'center',width:6},
+	        {field:'null',title:'操作',
+	        	formatter: function(value,row,index){
+					var str='';
+					if (row.filename!='无'){
+					    str='<a href="javascript:fileDown('+row.id+');">文件下载</a>';
+					}
+					return str;
+			},width:8}, 
+	       ]]    
+		});
+	}); 
+	
+	function search(value,name){ 
+		$('#dg_softflag').datagrid('reload',{"name":value});
+	} 
+</script>
+<!-- 用户数据表格 -->
+<table id="dg_softflag"></table>
+<br><br><br>
+&nbsp;&nbsp;使用须知：<br>
+&nbsp;&nbsp;1，新增账号时，密码初始为123456，【启停状态】为【启用】；<br>
+&nbsp;&nbsp;2，如果用户忘记密码，管理员可通过账号后方对应的【重置密码】，将密码初始为123456；<br>
+
+<!-- 定义菜单 -->
+<div id="tb_softflag">
+	<a id="tb_softflag_add" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+	<div class="datagrid-btn-separator"></div> 
+	<a id="tb_softflag_del"  style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除</a>
+	<div class="datagrid-btn-separator"></div>
+	<input id="name" class="easyui-searchbox" name="name" style="width:200px" 
+	data-options="searcher:search,prompt:'此处输入标题，支持模糊查询',menu:'#names'"></input> 
+	<div id="names" style="width:120px"> 
+		<div data-options="name:'all',iconCls:'icon-ok'">标题</div> 
+	</div>
+</div>

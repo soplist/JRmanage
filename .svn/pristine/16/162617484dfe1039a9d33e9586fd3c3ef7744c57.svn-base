@@ -1,0 +1,73 @@
+package com.bureau.pojo;
+
+/**
+ * Memo entity. @author MyEclipse Persistence Tools
+ */
+
+public class Memo implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String title;
+	private String content;
+	private String peopleid;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Memo() {
+	}
+
+	/** full constructor */
+	public Memo(String title, String content, String peopleid, String create) {
+		this.title = title;
+		this.content = content;
+		this.peopleid = peopleid;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return this.title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getContent() {
+		return this.content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getPeopleid() {
+		return this.peopleid;
+	}
+
+	public void setPeopleid(String peopleid) {
+		this.peopleid = peopleid;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

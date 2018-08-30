@@ -1,0 +1,72 @@
+package com.bureau.biz.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.LogBiz;
+import com.bureau.dao.LogDao;
+import com.bureau.pojo.Log;
+import com.bureau.pojo.PageData;
+
+public class LogBizImpl implements LogBiz{
+	//注入logDao
+	private LogDao logDao;
+	public void setLogDao(LogDao logDao) {
+		this.logDao = logDao;
+	}
+
+	public PageData<Log> findAllLog(Log log) {
+		String hql="from Log l";
+		String counthql="select count(l.id) from Log l";
+		Map<String, Object> params=new HashMap<String, Object>();
+		//模糊查询追加条件
+		if(log.getUser()!=null){
+			//System.out.println("user not null "+log.getUser().getRname());
+			hql+=" where l.user.rname like :rname";
+			counthql+=" where l.user.rname like :rname";
+			params.put("rname", "%"+log.getUser().getRname()+"%");
+		}else{
+			//System.out.println("user is null ");
+		}
+		hql+=" order by id desc";
+		//System.out.println("hql--"+hql);
+		//查询所有log信息
+		List<Log> logs = logDao.list(hql, params, (log.getPage()-1)*log.getRows(),log.getRows());
+		int total = logDao.count(counthql, params);
+		PageData<Log> pd = new PageData<Log>();
+		pd.setRows(logs);
+		pd.setTotal(total);
+		return pd;
+	}
+
+	public boolean addLog(Log log) {
+		//时间
+		Date day=new Date();    
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+		log.setLogDate(df.format(day));
+		return logDao.add(log);
+	}
+
+	public boolean delLog(Log log) {
+		return logDao.del(log);
+	}
+
+	public boolean delLog(int idStart, int idEnd) {
+		String hql = "delete from Log g where g.id between :a and :b";
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("a", idStart);
+		params.put("b", idEnd);
+		
+		if(logDao.execute(hql, params)>-1){
+			System.out.println("LOG删除成功");
+			return true;
+		}else{
+			System.out.println("LOG删除失败");
+		}
+		return false;
+	}
+
+}

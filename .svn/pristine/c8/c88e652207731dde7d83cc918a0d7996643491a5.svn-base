@@ -1,0 +1,143 @@
+package com.bureau.action;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.struts2.ServletActionContext;
+
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.bureau.biz.CheckepcarBiz;
+import com.bureau.pojo.Checkepcar;
+import com.bureau.pojo.CheckepcarVo;
+import com.bureau.pojo.Notice;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.QUser;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-13 上午10:42:29 
+ * 类说明 
+ */
+public class CheckepcarAction extends BaseAction implements ModelDriven<Checkepcar>  {
+	private Checkepcar cc;
+	private CheckepcarBiz ccBiz;
+    
+	public Checkepcar getCc() {
+		return cc;
+	}
+    public void setCc(Checkepcar cc) {
+		this.cc = cc;
+	}
+    public void setCcBiz(CheckepcarBiz ccBiz) {
+		this.ccBiz = ccBiz;
+	}
+
+	public Checkepcar getModel() {
+		if (cc == null) {
+			cc = new Checkepcar();
+		}
+		return cc;
+	}
+	
+	public void findByCarnumber(){
+		PageData<CheckepcarVo> pd = new PageData<CheckepcarVo>();
+		try{
+		    pd = ccBiz.findByCarnumber(cc);
+		    this.writeJSON(pd,new String[]{"persionfile","style"});
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void findAll(){
+		PageData<CheckepcarVo> pd = new PageData<CheckepcarVo>();
+		try{
+		    pd = ccBiz.findAll(cc);
+		    this.writeJSON(pd,new String[]{"persionfile","style"});
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void add() throws UnsupportedEncodingException{
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		boolean res = false;	
+		cc.setCreatetime(Quarter.getNowTime());
+		cc.setStatus(1);
+		res = ccBiz.add(cc);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void del(){
+		try{
+		    TempJson tj=new TempJson();
+		    tj.setMessage(SysConst.DELFAIL);
+		    
+		    cc = ccBiz.findById(cc.getId());
+		    
+		    boolean res = ccBiz.del(cc);
+		
+		    if(res){
+			    tj.setMessage(SysConst.DELSUCCESS);
+			    tj.setSuccess(true);
+		    }
+		    this.writeJSON(tj);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
+	
+	public void maintainUpdate(){
+		TempJson tj=new TempJson();
+		
+		Checkepcar c = ccBiz.findById(cc.getId());
+		
+		c.setPeople(cc.getPeople());
+		c.setCheckdate(cc.getCheckdate());
+		c.setResult(cc.getResult());
+		
+		boolean result = ccBiz.maintainUpdate(c);
+		if(result){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}else{
+			tj.setMessage(SysConst.UPDFAIL);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void returnvisitUpdate(){
+		TempJson tj=new TempJson();
+		
+		Checkepcar c = ccBiz.findById(cc.getId());
+		
+		c.setMan(cc.getMan());
+		c.setCalldate(cc.getCalldate());
+		c.setCallbrief(cc.getCallbrief());
+		
+		boolean result = ccBiz.returnvisitUpdate(c);
+		if(result){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}else{
+			tj.setMessage(SysConst.UPDFAIL);
+		}
+		this.writeJSON(tj);
+	}
+}

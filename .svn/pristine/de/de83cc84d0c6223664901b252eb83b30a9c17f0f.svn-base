@@ -1,0 +1,550 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<style type="text/css">
+    table{
+        border-collapse:collapse;
+    }
+
+    .datagrid-btable tr td{
+		border:1px solid #c0cdd8;
+        height: 40px;
+	}
+    .td_left{
+		background: #88a6b147;
+		width:25%;
+		text-align:right;
+		height:40px;
+		
+	}
+	.td_right{
+		width:25%;
+	}
+	.td_left_1{
+		background: #88a6b147;
+		width:30%;
+		text-align:right;
+		height:40px;
+		
+	}
+	.td_right_1{
+		width:70%;
+	}
+</style>
+<script type="text/javascript">
+    $(function(){
+		/* 验证session开始 */
+		var curPath = window.document.location.href;
+	 	var pathName = window.document.location.pathname;
+	 	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+	 	var s="<%=session.getAttribute("login_users")%>"; 
+	 	if(s=="null"){ 
+	 		top.location.href = location.href=basePath+"JRmanage";
+	 	}
+		/* 验证session开始 */
+        //加载表格数据
+		$('#dg_oldepcar').datagrid({    
+	    url:'o_findAll.action', 
+	    pagination:'true',
+	    singleSelect:'true',//只允许选取一行
+	    fitColumns:true,//宽度自适应  
+	    rownumbers:true,
+	    toolbar: '#tb_oldepcar',
+	    columns:[[
+	        {checkbox:true},   
+	        {field:'id',title:'编号',align:'center',width:4},  
+	        {field:'style',title:'企业类型',align:'center',width:8,
+				formatter: function(value,row,index){
+					return value.text;
+				}
+			},
+			{field:'customer',title:'所属公司',align:'center',width:8},
+			{field:'carnumber',title:'车牌号码',align:'center',width:8},
+			{field:'cnumber',title:'3G卡号',align:'center',width:8},
+			{field:'snumber',title:'SIM卡号',align:'center',width:8},
+			{field:'epdate',title:'企业盖章日期',align:'center',width:8},
+			{field:'transnumber',title:'运管盖章日期',align:'center',width:8},
+			{field:'reason',title:'报废/停运原因',align:'center',width:10},
+			{field:'source',title:'来源',align:'center',width:8},
+			{field:'remark1',title:'备注1',align:'center',width:8},
+			{field:'remark2',title:'备注2',align:'center',width:8},
+			{field:'system',title:'所属平台',align:'center',width:8},
+			{field:'remark',title:'备注',align:'center',width:8},
+	        ]]    
+		});
+		
+		//删除
+		$('#tb_oldepcar_del').on('click',function(){
+			var rows=$('#dg_oldepcar').datagrid('getChecked');//在复选框呗选中的时候返回所有行   	
+			if(rows.length==0){
+				 $.messager.show({title:'提示',msg:'请勾选要删除的记录'});
+			}else if(rows.length!=1){
+				$.messager.show({title:'提示',msg:'删除时只能选择一条记录'});
+			}else{
+				$.messager.confirm('确认','您确认想要删除该条记录吗？',function(r){    
+				    if (r){    
+				        $.post('o_del.action',{"id":rows[0].id},function(data){
+							var obj=$.parseJSON(data);
+					        $.messager.show({title:'提示',msg:obj.message});
+							$('#dg_oldepcar').datagrid('reload');//重新加载
+						});    
+				    }    
+				});  
+			} 
+		});
+		
+		//打开新增窗体
+		$('#tb_oldepcar_add').on('click',function(){
+		    $('#tb_oldepcar_add_dialog').dialog('open'); //点击新增按钮弹出新增页面
+		    initCombox($('#oldepcar_addForm #style'),'ce_findCartypeList.action',null,-1);
+		    setDatebox('#oldepcar_addForm #epdate');
+		    setDatebox('#oldepcar_addForm #transnumber');
+		});
+		
+		//取消
+		$('#tb_oldepcar_add_dialog_btc').on('click',function(){
+			$('#tb_oldepcar_add_dialog').dialog('close');
+		});
+		
+		//保存
+		$('#tb_oldepcar_add_dialog_bts').on('click',function(){
+			$('#oldepcar_addForm').form('submit', {    
+			    url:'o_add.action',     
+			    success:function(data){  
+			    //将 data转换成json  原因：从后台传递过来的数据，都是字符串  
+			        var obj=$.parseJSON(data);
+			        if(obj.success){
+			       		$('#oldepcar_addForm').form('clear');//清除表单数据。
+						$('#dg_oldepcar').datagrid('reload');// 重新载入当前页面数据 
+						$('#tb_oldepcar_add_dialog').dialog('close');//关闭对话框	
+			        }
+			        $.messager.show({title:'提示',msg:obj.message});
+			    }    
+			});
+		});
+		
+		//打开选择公司窗体
+		$('#tb_company_dialog_bt').on('click',function(){
+		    var top = $("#tb_oldepcar_add_dialog").offset().top + 150;
+            var left = $("#tb_oldepcar_add_dialog").offset().left+470;
+            $('#tb_company_dialog').dialog('open').window('resize',{top: top,left:left}); //点击新增按钮弹出新增页面
+            
+            //加载表格数据
+		    $('#dg_company').datagrid({    
+	            url:'customer_findTransportCompanys.action', 
+	            pagination:'true',
+	            singleSelect:'true',//只允许选取一行
+	            fitColumns:true,//宽度自适应  
+	            rownumbers:true,
+	            columns:[[
+	                {checkbox:true},     
+	                {field:'id',title:'编号',align:'center',width:2},
+	                {field:'name',title:'企业名称',align:'center',width:8},
+	            ]]    
+		    });
+		});
+		
+		//公司选择确定
+		$('#tb_company_dialog_bts').on('click',function(){
+		    var rows=$('#dg_company').datagrid('getChecked');
+			$('#oldepcar_addForm #customer').val(rows[0].name);
+			$('#tb_company_dialog').dialog('close');
+		});
+		
+		//公司选择取消
+		$('#tb_company_dialog_btc').on('click',function(){
+			$('#tb_company_dialog').dialog('close');
+		});
+		
+		
+        //修改保存
+		$('#tb_oldepcar_edit_dialog_bts').on('click',function(){
+			$('#oldepcar_editForm').form('submit', {    
+			    url:'o_update.action',     
+			    success:function(data){    
+			        var obj=$.parseJSON(data);
+			        if(obj.success){
+			        	$('#oldepcar_editForm').form('clear');
+						$('#dg_oldepcar').datagrid('reload');
+						$('#tb_oldepcar_edit_dialog').dialog('close');	
+			        }
+			        $.messager.show({
+					    title:'提示',
+					    msg:obj.message
+					});
+			    }    
+			});
+		});
+		
+		//取消修改换装信息
+		$('#tb_oldepcar_edit_dialog_btc').on('click',function(){
+			$('#tb_oldepcar_edit_dialog').dialog('close');
+		});
+		
+		//修改信息
+		$('#tb_oldepcar_ed').on('click',function(){
+			var rows=$('#dg_oldepcar').datagrid('getChecked'); //在复选框呗选中的时候返回所有行  
+			if(rows.length==0){
+				 $.messager.show({
+								title:'提示',
+								msg:'请勾选要修改的记录'
+				});
+			}else if(rows.length!=1){
+				$.messager.show({
+								title:'提示',
+								msg:'修改时只能选择一一条记录'
+			    });
+			}else{
+			    $('#tb_oldepcar_edit_dialog').dialog('open');
+			    
+	    		$('#oldepcar_editForm #id').val(rows[0].id);
+                initCombox($('#oldepcar_editForm #style'),'ce_findCartypeList.action',null,rows[0].style.id);
+				$('#oldepcar_editForm #customer').val(rows[0].customer);
+				$('#oldepcar_editForm #carnumber').val(rows[0].carnumber);
+	    		$('#oldepcar_editForm #cnumber').val(rows[0].cnumber);
+	    		$('#oldepcar_editForm #snumber').val(rows[0].snumber);
+	    		$('#oldepcar_editForm #epdate').val(rows[0].epdate);
+	    		$('#oldepcar_editForm #transnumber').val(rows[0].transnumber);
+	    		$('#oldepcar_editForm #reason').val(rows[0].reason);
+	    		$('#oldepcar_editForm #source').val(rows[0].source);
+	    		$('#oldepcar_editForm #remark1').val(rows[0].remark1);
+	    		$('#oldepcar_editForm #remark2').val(rows[0].remark2);
+	    		$('#oldepcar_editForm #system').val(rows[0].system);
+	    		$('#oldepcar_editForm #remark').val(rows[0].remark);
+			} 
+		});
+		
+		//编辑打开选择公司窗体
+		$('#tb_ed_company_dialog_bt').on('click',function(){
+		    var top = $("#tb_oldepcar_edit_dialog").offset().top + 150;
+            var left = $("#tb_oldepcar_edit_dialog").offset().left+470;
+            $('#tb_edit_company_dialog').dialog('open').window('resize',{top: top,left:left}); //点击新增按钮弹出新增页面
+            
+            //加载表格数据
+		    $('#dg_edit_company').datagrid({    
+	            url:'customer_findTransportCompanys.action', 
+	            pagination:'true',
+	            singleSelect:'true',//只允许选取一行
+	            fitColumns:true,//宽度自适应  
+	            rownumbers:true,
+	            columns:[[
+	                {checkbox:true},     
+	                {field:'id',title:'编号',align:'center',width:2},
+	                {field:'name',title:'企业名称',align:'center',width:8},
+	            ]]    
+		    });
+		});
+		
+		//编辑公司选择确定
+		$('#tb_edit_company_dialog_bts').on('click',function(){
+		    var rows=$('#dg_edit_company').datagrid('getChecked');
+			$('#oldepcar_editForm #customer').val(rows[0].name);
+			$('#tb_edit_company_dialog').dialog('close');
+		});
+		
+		//编辑公司选择取消
+		$('#tb_edit_company_dialog_btc').on('click',function(){
+			$('#tb_edit_company_dialog').dialog('close');
+		});
+		
+		//模糊查询
+		$('#btn').bind('click', function(){
+		    var starttime = document.getElementById("starttime").value;
+		    var endtime = document.getElementById("endtime").value;
+		    var carnumber = $('#carnumber').val();
+		    //把字符串格式转换为日期类
+		    var startdate = new Date(Date.parse(starttime));
+		    var enddate = new Date(Date.parse(endtime));
+		    if((starttime == "" && endtime != "")||(starttime != "" && endtime == "")){
+			    $.messager.alert('提示','请输入完整的时间间断'); 
+		    }
+		    else if(startdate >= enddate){
+			    $.messager.alert('提示','起始日期不能大于结束日期'); 
+		    }else{
+		        var idStart="",idEnd="";
+			    $.ajax({
+				    url: 'o_findBytime.action',
+				    data:{carnumber:carnumber,idStart:starttime,idEnd:endtime},
+				    type:"post",
+			        dataType:"json",   
+				    success: function(data) {
+					    if(data.length == 0){
+						    $.messager.alert('提示','根据查询条件，数据库无任何记录');
+					    }else{
+					        $('#dg_oldepcar').datagrid('reload',{carnumber:carnumber,idStart:starttime,idEnd:endtime});//重新加载
+					    }
+				    }
+			    });  	 
+		    }
+		});
+		
+		/* 为导出报表使用 */
+		$.ajax({
+			url: 'o_findBytime.action',
+			data:{},
+			type:"post",
+			dataType:"json",   
+			success: function(data) {
+			}
+		});
+	});
+	
+	function search(value,name){ 
+		$('#dg_oldepcar').datagrid('reload',{"carnumber":value});
+	} 	
+	
+	function setDatebox(id){
+	    var date = new Date();
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = year + seperator1 + month + seperator1 + strDate;
+        $(id).datebox('setValue', currentdate);
+	}
+</script>
+<!-- 用户数据表格 -->
+<table class="datagrid-btable" id="dg_oldepcar"></table>
+<br><br><br>
+
+<!-- 定义菜单 -->
+<div id="tb_oldepcar">
+	<a id="tb_oldepcar_add" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+	<div class="datagrid-btn-separator"></div> 
+	<a id="tb_oldepcar_ed" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">编辑</a>
+	<div class="datagrid-btn-separator"></div> 
+	<a id="tb_oldepcar_del"  style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除</a>
+	<div class="datagrid-btn-separator"></div>
+	<!-- 创建搜索框 -->
+	车牌号码<input id="carnumber" placeholder="车牌号码" style="width:150px;"></input>&nbsp;&nbsp;
+	起始时间：<input id="starttime"  type="text"  style="width:150px;"  placeholder="此处选择起始时间" class="Wdate" onfocus="WdatePicker({lang:'zh-cn',skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>&nbsp;------
+	结束时间：<input id="endtime"  type="text"  style="width:150px;"  placeholder="此处选择结束时间" class="Wdate" onfocus="WdatePicker({lang:'zh-cn',skin:'whyGreen',dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+	<button id="btn" class="easyui-linkbutton" style="width:50px;">搜索</button>
+	<a href="o_exportExcel.action" style="text-decoration: none;">
+	    <button id="export">导出报表</button>
+	</a>
+</div>
+
+<!-- 定义添加窗口-->
+<div id="tb_oldepcar_add_dialog" class="easyui-dialog" title="新增报废车辆信息" style="width:580px;height:700px;align:center;top:1px;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_oldepcar_add_dialog_bt'">   
+       <form id="oldepcar_addForm" method="post" enctype="multipart/form-data">
+       		<br><br><br>
+       		<table class="datagrid-btable" style="width: 96%;margin-left:2%;border: solid 1px #c0cdd8;">
+       		    <tr>
+	    		    <td class="td_left_1">车辆类型：</td>
+	    			<td class="td_right_1">
+	    			    <input id="style" name="style.id" style="width:280px;"/>
+	    			</td>
+	    		</tr>
+       		    <tr>
+	    			<td class="td_left_1">所属公司：</td>
+	    			<td class="td_right_1">
+	    			    <input type="text" style="width:280px;" id="customer" name="customer"  class="easyui-validatebox" data-options="required:true" readonly="true"/><input id="tb_company_dialog_bt" type="button" value="选择公司"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td class="td_left_1">车牌号码：</td>
+	    			<td class="td_right_1">
+	    				<input type="text" style="width:280px;" id="carnumber" name="carnumber"  class="easyui-validatebox" data-options="required:true" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">3G卡号：</td>
+	    			<td class="td_right_1">
+	    			    <input id="cnumber" name="cnumber" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">SIM卡号：</td>
+	    			<td class="td_right_1">
+	    			    <input id="snumber" name="snumber" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td class="td_left_1">企业盖章日期：</td>
+	    			<td class="td_right_1">
+	    				<input id="epdate" name="epdate"  type="text" style="width:280px;" class="easyui-datebox" editable="false" value=""/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td class="td_left_1">运管盖章日期：</td>
+	    			<td class="td_right_1">
+	    				<input id="transnumber" name="transnumber"  type="text" style="width:280px;" class="easyui-datebox" editable="false" value=""/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">报废/停运原因：</td>
+	    			<td class="td_right_1">
+	    			    <input id="reason" name="reason" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		<td class="td_left_1">来源：</td>
+	    			<td class="td_right_1">
+	    				<select style="width:280px;" class="easyui-combobox" id="source" name="source" >
+	    				    <option value='公司发文'>公司发文</option>
+	    				    <option value='销户申办表'>销户申办表</option>
+	    				    <option value='注销证明书'>注销证明书</option>
+	    				    <option value='运管通报'>运管通报</option>
+	    				</select> 
+					</td>
+				</tr>
+				<tr>
+	    		    <td class="td_left_1">备注1：</td>
+	    			<td class="td_right_1">
+	    			    <input id="remark1" name="remark1" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">备注2：</td>
+	    			<td class="td_right_1">
+	    			    <input id="remark2" name="remark2" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">所属平台：</td>
+	    			<td class="td_right_1">
+	    			    <input id="system" name="system" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">备注：</td>
+	    			<td class="td_right_1">
+	    			    <input id="remark" name="remark" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+			</table>	
+       </form>
+</div>
+<div id="tb_oldepcar_add_dialog_bt">
+	<a id="tb_oldepcar_add_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">保存</a>
+	<a id="tb_oldepcar_add_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>
+
+<!-- 定义选择公司窗口-->
+<div id="tb_company_dialog" class="easyui-dialog" title="公司信息" style="width:350px;height:500px;align:center;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_company_dialog_bt'">  
+       <table id="dg_company"></table> 
+       <!-- <input type="radio" name="cmys" checked value="1" ><span>aa</span></input> -->
+       <!-- <input type="radio" name="cmys" checked value="2" ><span>bb</span></input> -->
+</div>
+<div id="tb_company_dialog_bt">
+	<a id="tb_company_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">确定</a>
+	<a id="tb_company_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>
+
+<!-- 定义修改窗口-->
+<div id="tb_oldepcar_edit_dialog" class="easyui-dialog" title="修改报废车辆信息" style="width:580px;height:700px;align:center;top:1px;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_oldepcar_edit_dialog_bt'">   
+       <form id="oldepcar_editForm" method="post" enctype="multipart/form-data">
+            <br><br><br>
+       		<table class="datagrid-btable" style="width: 96%;margin-left:2%;border: solid 1px #c0cdd8;">
+       		    <tr>
+	    		    <td class="td_left_1">车辆类型：</td>
+	    			<td class="td_right_1">
+	    			    <input id="style" name="style.id" style="width:280px;"/>
+	    			    <input type="hidden" id="id" name="id"/>
+	    			</td>
+	    		</tr>
+       		    <tr>
+	    			<td class="td_left_1">所属公司：</td>
+	    			<td class="td_right_1">
+	    			    <input type="text" style="width:280px;" id="customer" name="customer"  class="easyui-validatebox" data-options="required:true" readonly="true"/><input id="tb_ed_company_dialog_bt" type="button" value="选择公司"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td class="td_left_1">车牌号码：</td>
+	    			<td class="td_right_1">
+	    				<input type="text" style="width:280px;" id="carnumber" name="carnumber"  class="easyui-validatebox" data-options="required:true" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">3G卡号：</td>
+	    			<td class="td_right_1">
+	    			    <input id="cnumber" name="cnumber" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">SIM卡号：</td>
+	    			<td class="td_right_1">
+	    			    <input id="snumber" name="snumber" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td class="td_left_1">企业盖章日期：</td>
+	    			<td class="td_right_1">
+	    				<input id="epdate" name="epdate"  type="text" style="width:280px;" class="easyui-datebox" editable="false" value=""/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td class="td_left_1">运管盖章日期：</td>
+	    			<td class="td_right_1">
+	    				<input id="transnumber" name="transnumber"  type="text" style="width:280px;" class="easyui-datebox" editable="false" value=""/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">报废/停运原因：</td>
+	    			<td class="td_right_1">
+	    			    <input id="reason" name="reason" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		<td class="td_left_1">来源：</td>
+	    			<td class="td_right_1">
+	    				<select style="width:280px;" class="easyui-combobox" id="source" name="source" >
+	    				    <option value='公司发文'>公司发文</option>
+	    				    <option value='销户申办表'>销户申办表</option>
+	    				    <option value='注销证明书'>注销证明书</option>
+	    				    <option value='运管通报'>运管通报</option>
+	    				</select> 
+					</td>
+				</tr>
+				<tr>
+	    		    <td class="td_left_1">备注1：</td>
+	    			<td class="td_right_1">
+	    			    <input id="remark1" name="remark1" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">备注2：</td>
+	    			<td class="td_right_1">
+	    			    <input id="remark2" name="remark2" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">所属平台：</td>
+	    			<td class="td_right_1">
+	    			    <input id="system" name="system" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    		    <td class="td_left_1">备注：</td>
+	    			<td class="td_right_1">
+	    			    <input id="remark" name="remark" style="width:280px;" type="text" />
+	    			</td>
+	    		</tr>
+			</table>	
+       </form>
+</div>
+<div id="tb_oldepcar_edit_dialog_bt">
+	<a id="tb_oldepcar_edit_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">保存</a>
+	<a id="tb_oldepcar_edit_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>
+
+<!-- 定义修改选择公司窗口-->
+<div id="tb_edit_company_dialog" class="easyui-dialog" title="公司信息" style="width:350px;height:500px;align:center;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_edit_company_dialog_bt'">  
+       <table id="dg_edit_company"></table> 
+       <!-- <input type="radio" name="cmys" checked value="1" ><span>aa</span></input> -->
+       <!-- <input type="radio" name="cmys" checked value="2" ><span>bb</span></input> -->
+</div>
+<div id="tb_edit_company_dialog_bt">
+	<a id="tb_edit_company_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">确定</a>
+	<a id="tb_edit_company_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>

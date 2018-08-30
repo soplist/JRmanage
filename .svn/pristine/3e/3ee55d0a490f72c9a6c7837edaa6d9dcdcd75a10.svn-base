@@ -1,0 +1,176 @@
+package com.bureau.pojo;
+
+/**
+ * Checkepcar entity. @author MyEclipse Persistence Tools
+ */
+
+public class Checkepcar implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String informadate;
+	private Integer customerid;
+	private String carnumber;
+	private String phone;
+	private String errorbrief;
+	private String number;
+	private Integer peopleid;
+	private String checkdate;
+	private String result;
+	private Integer manid;
+	private String calldate;
+	private String callbrief;
+	private Short isfinish;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Checkepcar() {
+	}
+
+	/** full constructor */
+	public Checkepcar(String informadate, Integer customerid, String carnumber,
+			String phone, String errorbrief, String number, Integer peopleid,
+			String checkdate, String result, Integer manid, String calldate,
+			String callbrief, Short isfinish, String create) {
+		this.informadate = informadate;
+		this.customerid = customerid;
+		this.carnumber = carnumber;
+		this.phone = phone;
+		this.errorbrief = errorbrief;
+		this.number = number;
+		this.peopleid = peopleid;
+		this.checkdate = checkdate;
+		this.result = result;
+		this.manid = manid;
+		this.calldate = calldate;
+		this.callbrief = callbrief;
+		this.isfinish = isfinish;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getInformadate() {
+		return this.informadate;
+	}
+
+	public void setInformadate(String informadate) {
+		this.informadate = informadate;
+	}
+
+	public Integer getCustomerid() {
+		return this.customerid;
+	}
+
+	public void setCustomerid(Integer customerid) {
+		this.customerid = customerid;
+	}
+
+	public String getCarnumber() {
+		return this.carnumber;
+	}
+
+	public void setCarnumber(String carnumber) {
+		this.carnumber = carnumber;
+	}
+
+	public String getPhone() {
+		return this.phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getErrorbrief() {
+		return this.errorbrief;
+	}
+
+	public void setErrorbrief(String errorbrief) {
+		this.errorbrief = errorbrief;
+	}
+
+	public String getNumber() {
+		return this.number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
+	}
+
+	public Integer getPeopleid() {
+		return this.peopleid;
+	}
+
+	public void setPeopleid(Integer peopleid) {
+		this.peopleid = peopleid;
+	}
+
+	public String getCheckdate() {
+		return this.checkdate;
+	}
+
+	public void setCheckdate(String checkdate) {
+		this.checkdate = checkdate;
+	}
+
+	public String getResult() {
+		return this.result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+	public Integer getManid() {
+		return this.manid;
+	}
+
+	public void setManid(Integer manid) {
+		this.manid = manid;
+	}
+
+	public String getCalldate() {
+		return this.calldate;
+	}
+
+	public void setCalldate(String calldate) {
+		this.calldate = calldate;
+	}
+
+	public String getCallbrief() {
+		return this.callbrief;
+	}
+
+	public void setCallbrief(String callbrief) {
+		this.callbrief = callbrief;
+	}
+
+	public Short getIsfinish() {
+		return this.isfinish;
+	}
+
+	public void setIsfinish(Short isfinish) {
+		this.isfinish = isfinish;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

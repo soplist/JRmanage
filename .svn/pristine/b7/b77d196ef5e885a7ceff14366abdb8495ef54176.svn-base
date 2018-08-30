@@ -1,0 +1,19 @@
+package com.bureau.biz;
+
+import com.bureau.pojo.Changeequipment;
+import com.bureau.pojo.Oldepcar;
+import com.bureau.pojo.OldepcarVo;
+import com.bureau.pojo.PageData;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-18 上午9:24:07 
+ * 类说明 
+ */
+public interface OldepcarBiz {
+	public PageData<OldepcarVo> findAll(Oldepcar o);
+	public boolean del(Oldepcar o);
+	public Oldepcar findById(Integer id);
+	public boolean add(Oldepcar o);
+	public boolean update(Oldepcar o);
+}

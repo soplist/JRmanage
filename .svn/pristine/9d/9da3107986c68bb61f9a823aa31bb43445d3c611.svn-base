@@ -1,0 +1,89 @@
+package com.bureau.action;
+
+import java.util.List;
+
+import com.bureau.biz.PersionFileBiz;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Personfile;
+import com.bureau.pojo.QUser;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.MD5Util;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-4 上午11:23:11 
+ * 类说明 
+ */
+public class PersionFileAction  extends BaseAction implements ModelDriven<Personfile>{
+	
+	private Personfile pf;
+	private PersionFileBiz persionfileBiz;
+	
+	public void setPersionfileBiz(PersionFileBiz persionfileBiz) {
+		this.persionfileBiz = persionfileBiz;
+	}
+	public Personfile getPf() {
+		return pf;
+	}
+    public void setPf(Personfile pf) {
+		this.pf = pf;
+	}
+
+
+	public Personfile getModel() {
+		if(pf==null){
+			pf=new Personfile();
+		}
+		return pf;
+	}
+	
+	//添加档案信息
+	public void add(){
+		TempJson tj=new TempJson();
+		
+		String nowTime = Quarter.getNowTime();
+		pf.setCreatetime(nowTime);
+		boolean result = persionfileBiz.add(pf);
+		
+		//QUser us = (QUser) session.get("login_users");
+		
+		if(result){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+			//写入日志
+			//this.addLog(us, "添加用户", res);
+		}else{
+			tj.setMessage(SysConst.ADDFAIL);
+			//this.addLog(us, "添加用户", !res);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void update(){
+		TempJson tj=new TempJson();
+		boolean result = persionfileBiz.update(pf);
+		if(result){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}else{
+			tj.setMessage(SysConst.UPDFAIL);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void findAllPersonfiles(){
+		PageData<Personfile> pd=persionfileBiz.findAllPersonfile(pf);
+		this.writeJSON(pd);
+	}
+	
+	//查询人事信息
+	public void findPeople(){
+		System.out.println("persionFileBiz");
+		List<Personfile> tos = persionfileBiz.findall();	
+		this.writeJSON(tos,new String[]{"privatecar,carrecord"});
+	}
+
+}

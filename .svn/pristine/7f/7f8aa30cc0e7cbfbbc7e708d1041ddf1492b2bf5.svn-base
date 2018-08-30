@@ -1,0 +1,43 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!-- 引入资源文件 -->
+
+<%
+	String easyuiTheme="default";
+	Cookie[] cookies=request.getCookies();
+	if(cookies!=null&&cookies.length>0){
+		for(Cookie c:cookies){
+			if(c.getName().equals("easyuiTheme")){
+				easyuiTheme=c.getValue();
+				break;
+			}
+		}
+	}
+	
+ %>
+<meta name="renderer" content="webkit" />
+<!-- 引入easyUI对应的CSS文件 -->
+<link rel="stylesheet" id="easyuiTheme" type="text/css" href="resource/easyui/themes/default/easyui.css"/>
+<!-- 引入easyUI的图标文件 -->
+<link rel="stylesheet" type="text/css" href="resource/easyui/themes/icon.css"/>
+<link rel= "shortcut icon " href= "./resource/image/favicon.ico">
+<!-- 引入juqery -->
+<script type="text/javascript" src="resource/easyui/jquery.min.js"></script>
+<!-- 引入easyUI对应的JS文件 -->
+<script type="text/javascript" src="resource/easyui/jquery.easyui.min.js"></script>
+<!-- 引入easyUI语言 -->
+<script type="text/javascript" src="resource/easyui/locale/easyui-lang-zh_CN.js"></script>
+<!-- 引入easyUI的tree扩展文件 -->
+<script type="text/javascript" src="resource/js/extEasyUI.js"></script>
+<!-- 引入juquery cookie -->
+<script type="text/javascript" src="resource/js/jquery.cookie.js"></script>
+<!-- 引入自定义的JS -->
+<script type="text/javascript" src="resource/js/SysUtil.js"></script>
+
+<!-- Highcharts图表专用 -->
+<script type="text/javascript" src="resource/Highcharts/highcharts.js"></script>
+<!-- 添加主题样式js文件 -->
+<script src="resource/Highcharts/themes/grid.js" type="text/javascript"></script>  
+<!--添加导出模式 -->  
+<script src="resource/Highcharts/modules/exporting.js" type="text/javascript"></script>
+<!--添加日期插件的js  by 李金-->
+<script type="text/javascript" src="resource/My97DatePicker/WdatePicker.js"></script>

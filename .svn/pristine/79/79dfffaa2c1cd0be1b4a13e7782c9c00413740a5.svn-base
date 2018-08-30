@@ -1,0 +1,109 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="com.bureau.pojo.QUser"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<script type="text/javascript">
+
+	$(function(){
+		/* 验证session开始 */
+		var curPath = window.document.location.href;
+	 	var pathName = window.document.location.pathname;
+	 	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+	 	var s="<%=session.getAttribute("login_users")%>"; 
+	 	if(s=="null"){ 
+	 		top.location.href = location.href=basePath+"jfinfo";
+	 	}
+		/* 验证session开始 */
+		//加载表格数据
+		$('#dg_user').datagrid({    
+	    url:'log_findAllLogs.action', 
+	    pagination:'true',
+	    fitColumns:'true',
+	    rownumbers:true,   
+	    toolbar: '#tb_user',
+	    columns:[[
+	             
+	        {field:'id',title:'编号',width:10}, 
+	        {field:'logDate',title:'操作日期',width:25},
+	        {field:'logText',title:'操作内容',width:15},
+	        {field:'logDone',title:'操作结果',width:10,
+	        	formatter: function(value,row,index){
+					if (row.logDone=='1'){
+						return '<span style="color:green">成功</span>';
+					} else {
+						return '<span style="color:red">失败</span>';
+					}
+				}
+	        },
+	        {field:'user',title:'操作用户',width:20,
+	        	formatter: function(value,row,index){
+					return row.user.rname;
+				}
+	        },
+	        
+	        {field:'null',title:'操作',width:20,
+	        	formatter: function(value,row,index){
+		        	if($('#ip_lname').val()=="root"){
+		        		var str='';
+						str='<a id="adel" href="javascript:logDel('+row.id+');">删除记录</a>';
+						return str;
+		        	}else{
+		        		return "无删除权限";
+		        	}	
+				}},  
+		    ]]    
+		});
+		
+	});
+
+	
+	//删除
+	function logDel(id){
+		$.messager.confirm('确认','警告：删除后无法恢复!',function(r){    
+		    if (r){    
+		        $.post('user_logDel.action',{"id":id},function(data){
+					var obj=$.parseJSON(data);
+			        $.messager.show({
+								title:'提示',
+								msg:obj.message
+					});
+					$('#dg_user').datagrid('reload');//重新加载
+				});    
+		    }    
+		}); 
+	}
+	
+	//模糊查询
+	function search(value,name){ 
+		$('#dg_user').datagrid('reload',{"user.rname":value});
+	} 
+
+	
+</script>
+
+
+<!-- 当前用户的lname -->
+&nbsp;&nbsp;当前用户帐号：<span id="sp_lname" >${login_users.lname}</span>
+<input id="ip_lname" type="hidden" value="${login_users.lname}"/>
+
+
+<br><br>
+<!-- 用户数据表格 -->
+<table id="dg_user"></table>
+<br><br><br>
+&nbsp;&nbsp;说明：<br>
+&nbsp;&nbsp;1、所有的日志记录由系统自动生成；<br>
+&nbsp;&nbsp;2、不可进行删除操作；<br>
+&nbsp;&nbsp;<span style="color: red">3、日志永久保存</span><br>
+&nbsp;&nbsp;4，更多问题请联系超级管理员<br><hr><br>
+
+<!-- 定义菜单 -->
+<div id="tb_user">
+	<div class="datagrid-btn-separator"></div>
+	<!-- 创建搜索框 -->
+	<input id="rname" class="easyui-searchbox" name="user.rname" style="width:400px" 
+	data-options="searcher:search,prompt:'此处输入操作用户名称，支持模糊查询',menu:'#rnames'"></input> 
+
+	<div id="rnames" style="width:120px"> 
+		<div data-options="name:'all',iconCls:'icon-ok'">操作用户</div> 
+	</div>
+</div>

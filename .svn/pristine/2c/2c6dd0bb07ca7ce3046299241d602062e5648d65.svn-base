@@ -1,0 +1,279 @@
+package com.bureau.action;
+
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.LogBiz;
+import com.bureau.biz.UserBiz;
+import com.bureau.pojo.Dictionary;
+import com.bureau.pojo.Log;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.QUser;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.MD5Util;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class UserAction extends BaseAction implements ModelDriven<QUser>{
+	
+	//修改密码第一次和再次输入的值
+	private String pwd;
+	private String rpwd;
+	public String getRpwd() {
+		return rpwd;
+	}
+	public void setRpwd(String rpwd) {
+		this.rpwd = rpwd;
+	}
+	public String getPwd() {
+		return pwd;
+	}
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
+	//输入的原始密码
+	private String opass;
+	public String getOpass() {
+		return opass;
+	}
+	public void setOpass(String opass) {
+		this.opass = opass;
+	}
+
+	//注入操作用户业务的Biz
+	private UserBiz userBiz;
+	public void setUserBiz(UserBiz userBiz) {
+		this.userBiz = userBiz;
+	}
+	//注入logBiz
+	private LogBiz logBiz;
+	public void setLogBiz(LogBiz logBiz) {
+		this.logBiz = logBiz;
+	}
+	
+	//定义页面需要传递的对象
+	private QUser u;
+	public QUser getU() {
+		return u;
+	}
+	public void setU(QUser u) {
+		this.u = u;
+	}
+	//登陆验证
+	public void login(){
+		//查询数据库中是否存在正在登陆的用户
+		System.out.println("come in ```+"+u.getLname()+u.getLpass());
+		boolean result = userBiz.findUserByLogin(u.getLname(), MD5Util.md5Encode(u.getLpass()),session);
+		System.out.println(MD5Util.md5Encode(u.getLpass()));		
+		//将结果输出到页面
+		this.writeJSON(result);	
+	}
+
+
+	//查询所有用户-启用的
+	public void findAllUsers(){
+		//u里面仅包含page和rows两个属性，需要将lname属性从session中拿出来放入
+		QUser us = (QUser) session.get("login_users");
+		u.setLname(us.getLname());
+		
+		PageData<QUser> pd=userBiz.findAllUser(u);
+		this.writeJSON(pd,new String[]{"lpass","qMenus","qUsers"});
+	}
+	//查询所有用户-禁用的
+	public void findAllUsersDel(){
+		//u里面仅包含page和rows两个属性，需要将lname属性从session中拿出来放入
+		QUser us = (QUser) session.get("login_users");
+		u.setLname(us.getLname());
+		PageData<QUser> pd=userBiz.findAllUserDel(u);
+		this.writeJSON(pd,new String[]{"lpass","projectses","notices","logs","supers","qRoles","declares","tbcounts","objectives","honors","bases","brands","qUsers","abilities","projectsesForStateId","projectsesForNature"});
+	}
+	//退出登录
+	public String logout(){
+		this.session.clear();
+		this.setPath(contactPath("login.jsp"));
+		return "ok";
+	}
+	
+	//更新用户
+	public void upd(){
+		System.out.println("22222222");
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.UPDFAIL);
+		boolean res = userBiz.updUser(u);
+		System.out.println("22222222");
+		if(res){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//查询某一个用户
+	public void findByUser(){
+		QUser us = (QUser) session.get("login_users");
+		QUser pd= userBiz.findUserByLname(us.getLname());
+		Map<String,Object> map=new HashMap<String, Object>();
+		map.put("Phone", pd.getPhone());
+		this.writeJSON(map);
+	}
+	//添加用户-页面验证
+	//ajax判断是否已存在
+	public void isbe(){
+		if(u.getLname()!=null){
+			QUser user = null;
+			user = userBiz.findUserByLname(u.getLname());
+			boolean result = false;
+			if(user!=null){
+				result = true ;
+			}
+			this.writeJSON(result);
+		}
+	}
+	//查询字典表中所有存在的部门
+	public void finddpartList(){
+		List<Dictionary> dparts=userBiz.finddpartList();
+		this.writeJSON(dparts,new String[]{"qUsers","parent"});
+	}
+	//添加用户
+	public void add(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		//密码进行MD5加密
+		u.setLpass(MD5Util.md5Encode(u.getLpass()));
+		boolean res = userBiz.addUser(u);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//重置密码
+	public void resetPass(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.RESETFAIL);
+		//充值为123456
+		boolean res = userBiz.updLpass(u.getId(),SysConst.RESETPASSWORD);
+		if(res){
+			tj.setMessage(SysConst.RESETSUCCESS);
+			tj.setSuccess(true);
+		}
+		//写入日志
+		if(res){
+			//存入日志
+			Log log = new Log();
+			log.setTitle("重置密码123456");
+			log.setPeople(u.getLname());
+			//时间
+			Date day=new Date();    
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			log.setCreatetime(df.format(day));
+			log.setIsfinish(1);
+			logBiz.addLog(log);	
+		}
+		this.writeJSON(tj);
+	}
+	//删除用户
+		public void del(){
+			TempJson tj=new TempJson();
+			tj.setMessage(SysConst.DELFAIL);
+			boolean res = userBiz.delUser(u);
+			if(res){
+				tj.setMessage(SysConst.DELSUCCESS);
+				tj.setSuccess(true);
+			}
+			//写入日志
+			if(res){
+				//存入日志
+				Log log = new Log();
+				log.setTitle("删除用户");
+				log.setPeople(u.getLname());
+				//时间
+				Date day=new Date();    
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+				log.setCreatetime(df.format(day));
+				log.setIsfinish(1);
+				logBiz.addLog(log);	
+			}
+			this.writeJSON(tj);
+		}
+	
+	//彻底删除
+	public void finalDel(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.DELFAIL);
+		//为了保证能够删除，user对象应包含id、lname、lpass三条属性，其中lname和lpass是模拟信息。
+		boolean res = userBiz.delUserFinal(u);
+		if(res){
+			tj.setMessage(SysConst.DELSUCCESS);
+			tj.setSuccess(true);
+		}
+		//写入日志
+		if(res){
+			//存入日志
+			Log log = new Log();
+			log.setTitle("彻底删除用户");
+			log.setPeople(u.getLname());
+			//时间
+			Date day=new Date();    
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			log.setCreatetime(df.format(day));
+			log.setIsfinish(1);
+			logBiz.addLog(log);	
+		}
+		this.writeJSON(tj);
+	}
+	//角色授权
+	public void grant(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.GRANTFAIL);
+		boolean res = userBiz.updgrantRole(u);
+		if(res){
+			tj.setMessage(SysConst.GRANTSUCCESS);
+			tj.setSuccess(true);
+		}
+		//写入日志
+		if(res){
+			//存入日志
+			Log log = new Log();
+			log.setTitle("角色授权");
+			log.setPeople(u.getLname());
+			//时间
+			Date day=new Date();    
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			log.setCreatetime(df.format(day));
+			log.setIsfinish(1);
+			logBiz.addLog(log);
+		}
+		this.writeJSON(tj);
+	}
+	//验证原密码是否正确
+	public void checkpass(){
+		if(MD5Util.md5Encode(opass).equals(((QUser)(session.get("login_users"))).getLpass())){
+			this.writeJSON(true);
+		}else{
+			this.writeJSON(false);
+		}
+	}
+	//修改密码
+	public void changePass(){
+		
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.RESETFAIL);
+		if(pwd.equals(rpwd)){
+			boolean res = userBiz.updLpass(((QUser)(session.get("login_users"))).getId(),pwd);
+		}
+		this.writeJSON(tj);	
+	}
+
+	//ModelDriven
+	public QUser getModel() {
+		if(u==null){
+			u=new QUser();
+		}
+		return u;
+	}
+}

@@ -1,0 +1,136 @@
+package com.bureau.biz.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.OldepcarBiz;
+import com.bureau.dao.OldepcarDao;
+import com.bureau.pojo.Changeequipment;
+import com.bureau.pojo.ChangeequipmentVo;
+import com.bureau.pojo.Customer;
+import com.bureau.pojo.Dictionary;
+import com.bureau.pojo.Oldepcar;
+import com.bureau.pojo.OldepcarVo;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Personfile;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-18 上午9:24:31 
+ * 类说明 
+ */
+public class OldepcarBizImpl implements OldepcarBiz {
+private OldepcarDao oDao;
+
+public void setoDao(OldepcarDao oDao) {
+	this.oDao = oDao;
+}
+
+public PageData<OldepcarVo> findAll(Oldepcar o) {
+	String hql="from Oldepcar o ";
+	String counthql="select count(o.id) from Oldepcar o";
+	Map<String, Object> params=new HashMap<String, Object>();
+	
+	if(o.getCarnumber()!=null){
+		hql+=" where o.carnumber like :carnumber";
+		counthql+=" where o.carnumber like :carnumber";
+		params.put("carnumber", "%"+o.getCarnumber()+"%");
+	}
+	hql+="  order by o.id desc";
+	
+	List<Oldepcar> os = oDao.list(hql, params,
+			(o.getPage()-1)*o.getRows(),o.getRows());
+	PageData<OldepcarVo> pd = new PageData<OldepcarVo>();
+	Integer total = oDao.count(counthql, params);
+	pd.setRows(addEmptyPeople(os));
+	pd.setTotal(total);
+	return pd;
+}
+
+public List<OldepcarVo> addEmptyPeople(List<Oldepcar> os){
+	List<OldepcarVo> volist = new ArrayList<OldepcarVo>();
+	for(Oldepcar o : os){
+		OldepcarVo vo = new OldepcarVo();
+		
+		vo.setId(o.getId());
+		vo.setStyle(o.getStyle());
+		vo.setCustomer(o.getCustomer());
+		vo.setCarnumber(o.getCarnumber());
+		vo.setCnumber(o.getCnumber());
+		vo.setSnumber(o.getSnumber());
+		vo.setEpdate(o.getEpdate());
+		vo.setTransnumber(o.getTransnumber());
+		vo.setReason(o.getReason());
+		vo.setSource(o.getSource());
+		vo.setRemark1(o.getRemark1());
+		vo.setRemark2(o.getRemark2());
+		vo.setSystem(o.getSystem());
+		vo.setRemark(o.getRemark());
+		vo.setCreatetime(o.getCreatetime());
+		volist.add(vo);
+	}
+	for(OldepcarVo ov : volist){
+		if(ov.getCustomer()==null){
+			ov.setCustomer(new Customer());
+		}
+		if(ov.getStyle()==null){
+			ov.setStyle(new Dictionary());
+		}
+		//ccv.setCustomer(new Customer());
+	}
+	return volist;
+}
+
+     //delete
+	public boolean del(Oldepcar o) {
+		return oDao.del(o);
+	}
+	
+	public Oldepcar findById(Integer id) {
+		return oDao.get(id);
+	}
+	
+	public boolean add(Oldepcar o) {
+		return oDao.add(o);
+	}
+	
+	//update
+	public boolean update(Oldepcar o) {
+		String hql="update Oldepcar o set o.style.id=:styleid,o.customer.id=:customerid,o.carnumber=:carnumber,o.cnumber=:cnumber,o.snumber=:snumber,o.epdate=:epdate,o.transnumber=:transnumber,o.reason=:reason,o.source=:source,o.remark1=:remark1,o.remark2=:remark2,o.system=:system,o.remark=:remark where o.id=:id";
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("id",o.getId());
+		params.put("styleid",o.getStyle().getId());
+		params.put("customerid",o.getCustomer().getId());
+		params.put("carnumber",o.getCarnumber());
+		params.put("cnumber",o.getCnumber());
+		params.put("snumber",o.getSnumber());
+		params.put("epdate",o.getEpdate());
+		params.put("transnumber",o.getTransnumber());
+		params.put("reason",o.getReason());
+		params.put("source",o.getSource());
+		params.put("remark1",o.getRemark1());
+		params.put("remark2",o.getRemark2());
+		params.put("system",o.getSystem());
+		params.put("remark",o.getRemark());
+		if(oDao.execute(hql, params)>-1){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	
+	//按车辆类型统计(报废)车辆数量      by-李金2018-8-21
+	public Integer findAllSum(Integer carstyle,String idStart, String idEnd){
+		String counthql="select count(o.id) from Oldepcar o where o.style.id=:carstyle and o.epdate between :a and :b order by o.id desc";		
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("carstyle", carstyle);
+		params.put("a", idStart);
+		params.put("b", idEnd);
+		//查询记录条数
+		Integer total = oDao.count(counthql, params);
+		return total;
+	}
+}

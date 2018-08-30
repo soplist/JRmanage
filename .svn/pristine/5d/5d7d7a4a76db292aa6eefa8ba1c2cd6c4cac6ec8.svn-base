@@ -1,0 +1,42 @@
+package com.bureau.action;
+
+import com.bureau.biz.SoftflagBiz;
+import com.bureau.pojo.Document;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Softflag;
+import com.opensymphony.xwork2.ModelDriven;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-9 下午4:19:56 
+ * 类说明 
+ */
+public class SoftflagAction extends BaseAction implements ModelDriven<Softflag>   {
+	
+	private Softflag sf;
+	private SoftflagBiz sfBiz;
+
+	public void setSfBiz(SoftflagBiz sfBiz) {
+		this.sfBiz = sfBiz;
+	}
+	public Softflag getSf() {
+		return sf;
+	}
+    public void setSf(Softflag sf) {
+		this.sf = sf;
+	}
+
+	public Softflag getModel() {
+		// TODO Auto-generated method stub
+		if (sf == null) {
+			sf = new Softflag();
+		}
+		return sf;
+	}
+
+	public void findAll(){
+		PageData<Softflag> pd = new PageData<Softflag>();
+		pd = sfBiz.findAll(sf);
+		this.writeJSON(pd);
+	}
+}

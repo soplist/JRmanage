@@ -1,0 +1,266 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<script type="text/javascript">
+var nc_id = 0;
+	$(function(){
+		/* 验证session开始 */
+		var curPath = window.document.location.href;
+	 	var pathName = window.document.location.pathname;
+	 	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+	 	var s="<%=session.getAttribute("login_users")%>"; 
+	 	if(s=="null"){ 
+	 		top.location.href = location.href=basePath+"jfinfo";
+	 	}
+		/* 验证session开始 */
+        //加载表格数据
+		$('#dg_user').datagrid({    
+	    url:'nc_findAll.action', 
+	    pagination:'true',
+	    singleSelect:'true',//只允许选取一行
+	    fitColumns:true,//宽度自适应  
+	    rownumbers:true,
+	    toolbar: '#tb_user',
+	    columns:[[
+	        {checkbox:true},     
+	        {field:'noticeTitle',title:'公告标题',align:'center',width:14},
+	        {field:'noticeText',title:'公告内容',align:'center',width:48},
+	        {field:'user',title:'创建人',align:'center',width:6,formatter:function(v,r,i){return v.rname;	}},
+	        {field:'createTime',title:'创建时间',align:'center',width:6},
+	        {field:'noticeFile',title:'文件',align:'center',width:14},
+	        {field:'null',title:'操作',
+	        	formatter: function(value,row,index){
+					var str='';
+					str='<a href="javascript:fileDownList('+row.id+');">文件下载统计</a>';
+					return str;
+			}}, 
+	       ]]    
+		});
+		
+		 //打开添加窗口---增加功能
+		$('#tb_user_add').on('click',function(){
+			$('#tb_user_add_dialog').dialog('open'); //点击新增按钮弹出新增页面 
+		});
+		
+		//保存
+		$('#tb_user_add_dialog_bts').on('click',function(){
+			$('#add_form').form('submit', {    
+			    url:'nc_add.action',     
+			    success:function(data){  
+			    //将 data转换成json  原因：从后台传递过来的数据，都是字符串  
+			        var obj=$.parseJSON(data);
+			        if(obj.success){
+			       		$('#add_form').form('clear');//清除表单数据。
+						$('#dg_user').datagrid('reload');// 重新载入当前页面数据 
+						$('#tb_user_add_dialog').dialog('close');//关闭对话框	
+			        }
+			        $.messager.show({title:'提示',msg:obj.message});
+			    }    
+			});
+		});
+		//取消
+		$('#tb_user_add_dialog_btc').on('click',function(){
+			$('#tb_user_add_dialog').dialog('close');
+		});
+		
+		//修改公告
+		$('#tb_user_ed').on('click',function(){
+			var rows=$('#dg_user').datagrid('getChecked'); //在复选框呗选中的时候返回所有行  
+			if(rows.length==0){
+				 $.messager.show({title:'提示',msg:'请勾选要修改的公告项'});
+			}else if(rows.length!=1){
+				$.messager.show({title:'提示',msg:'修改时只能选择一个公告项'});
+			}else{
+				$('#tb_user_upd_dialog').dialog('open');
+				$('#user_updForm #id').val(rows[0].id);
+				$('#user_updForm #noticeTitle').val(rows[0].noticeTitle);
+				$('#user_updForm #noticeText').val(rows[0].noticeText);
+			} 
+		});
+		//保存
+		$('#tb_user_upd_dialog_bts').on('click',function(){
+			$('#user_updForm').form('submit', {    
+			    url:'nc_upd.action',     
+			    success:function(data){    
+			        var obj=$.parseJSON(data);
+			        if(obj.success){
+			        	$('#user_updForm').form('clear');
+						$('#dg_user').datagrid('reload');
+						$('#tb_user_upd_dialog').dialog('close');	
+			        }
+			        $.messager.show({title:'提示',msg:obj.message});
+			    }    
+			});
+		});
+		//取消
+		$('#tb_user_upd_dialog_btc').on('click',function(){
+			$('#tb_user_upd_dialog').dialog('close');
+		});
+		
+		//删除某条公告
+		$('#tb_user_del').on('click',function(){
+			var rows=$('#dg_user').datagrid('getChecked');//在复选框呗选中的时候返回所有行   	
+			if(rows.length==0){
+				 $.messager.show({title:'提示',msg:'请勾选要修改的公告项'});
+			}else if(rows.length!=1){
+				$.messager.show({title:'提示',msg:'修改时只能选择一个公告项'});
+			}else{
+				$.messager.confirm('确认','您确认想要删除该条公告记录吗？',function(r){    
+				    if (r){    
+				        $.post('nc_del.action',{"id":rows[0].id},function(data){
+							var obj=$.parseJSON(data);
+					        $.messager.show({title:'提示',msg:obj.message});
+							$('#dg_user').datagrid('reload');//重新加载
+						});    
+				    }    
+				});  
+			} 
+		});
+		
+				
+	$('#btn').bind('click', function(){ 	
+		var schep = $('#sch_ep').val();//获得企业名称
+		var htm1 = "";
+		$("#tab_filelist").html(htm1);
+		if(schep != ""){
+			$.ajax({
+			url: 'nc_findEpByUser.action',
+			data:{
+				schep:schep,
+				ncid:nc_id
+			},
+			type:"post",
+			dataType:"json",   
+			success: function(data) {
+				if(data.length>0){
+					var htm1 = "";
+					for(var i =0;i<data.length;i++){
+					htm1 += '<table  style="width: 80%;margin-left:10%;text-algin:left;border: solid 2px #c0cdd8;" cellpadding="1" cellspacing="0">'+
+				         '<tr>'+
+							'<td id="td_left" style="width:15%;">企业名称:	</td>'+
+							'<td style="width:30%;">'+data[i][0]+'</td>'+
+							'<td id="td_left" style="width:10%;">联系人:	</td>'+
+							'<td style="width:15%;">'+data[i][1]+'</td>'+
+							'<td id="td_left" style="width:10%;">电话:	</td>'+
+							'<td style="width:15%;">'+data[i][2]+'</td>'+
+						 '</tr>'+'</table>'+'<br/>'
+					}
+					$("#tab_filelist").html(htm1);
+				}else{
+					$.messager.alert('提示','根据查询条件，数据库无任何记录');
+				}
+			}
+		});  	 	
+		}else{
+			$.messager.alert('提示','请输入要查询的企业');
+		}
+	});
+}); 
+//文件上传  
+function show(id){
+	$('#nf').val(id);
+	$('#tb_user_add_up').dialog('open'); 
+} 
+//文件下载统计
+function fileDownList(id){
+    nc_id = id;
+	$('#tb_user_file_list').dialog('open'); 
+	$.post('nc_fileSumList.action',
+		{"ncid":id},
+		function(data){
+		var obj=$.parseJSON(data);
+			if(obj.length > 0){
+				var htm = "";
+				for(var i =0;i<obj.length;i++){
+					htm += '<table  style="width: 80%;margin-left:10%;text-algin:left;border: solid 2px #c0cdd8;" cellpadding="1" cellspacing="0">'+
+				         '<tr>'+
+							'<td id="td_left" style="width:15%;">企业名称:	</td>'+
+							'<td style="width:30%;">'+obj[i][0]+'</td>'+
+							'<td id="td_left" style="width:10%;">联系人:	</td>'+
+							'<td style="width:15%;">'+obj[i][1]+'</td>'+
+							'<td id="td_left" style="width:10%;">电话:	</td>'+
+							'<td style="width:15%;">'+obj[i][2]+'</td>'+
+						 '</tr>'+'</table>'+'<br/>'
+				}
+			}
+			$("#tab_filelist").html(htm);
+		}
+	); 
+	$('#dg_user').datagrid('reload');//重新加载
+}
+</script>
+
+<!-- 公告开始 -->
+<!-- 用户数据表格 -->
+<table id="dg_user"></table>
+<br><br>
+&nbsp;&nbsp;使用须知：<br>
+&nbsp;&nbsp;1，超级管理员在此可以发布公告、删除公告；<br>
+&nbsp;&nbsp;2，公告中可以上传文件，上传单个文件最大不能超过15MB，上传多文件时请将多文件打包成一个压缩包zip格式再上传且压缩包不能大于20MB,否则会上传失败；<br>
+&nbsp;&nbsp;3，上传文件格式仅限于doc|docx|pdf|xlsx|xls|ppt|pptx,压缩包文件除外；<br>
+&nbsp;&nbsp;4，上传多文件时文件名不能重复，文件名不能含特殊字符；<br><hr><br>
+<!-- 定义菜单 -->
+<div id="tb_user">
+	<a id="tb_user_add" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+	<div class="datagrid-btn-separator"></div> 
+	<a id="tb_user_del"  style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除</a>
+	<div class="datagrid-btn-separator"></div>
+</div>
+
+<!-- 定义添加窗口-->
+<div id="tb_user_add_dialog" class="easyui-dialog" title="新增公告信息" style="width:450px;height:300px;align:center;top:1px;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_user_add_dialog_bt'">   
+       <form action="" id="add_form" method="post" enctype="multipart/form-data">
+       
+       		<br><br><br>
+       		<table>
+	    		<tr>
+	    		
+	    			<td width="25px"></td>
+	    			<td align="right">公告标题：</td>
+	    			<td>
+	    				<input type="text" style="width:280px;" id="noticeTitle" name="noticeTitle" />
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">公告内容：</td>
+	    			<td>
+	    				<textarea style="height:80px;width:280px" id="noticeText" name="noticeText"></textarea>
+	    			</td>
+	    		</tr>	    		  		
+	    	    <tr>
+	    			<td></td>
+	    			<td align="right">创建时间：</td>
+	    			<td>
+	    				<input type="text" style="width:280px;" class="easyui-datetimebox" id="createTime" name="createTime" value="08/08/2014" disabled="disabled"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">文件上传：</td>
+	    			<td>
+	    				<input type="file" name="pic"/><br/>
+	    			</td>
+	    		</tr>
+			</table>	
+       </form>
+       
+</div>
+<div id="tb_user_add_dialog_bt">
+	<a id="tb_user_add_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">保存</a>
+	<a id="tb_user_add_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>
+
+<!--文件下载企业统计 -->
+<div id="tb_user_file_list" class="easyui-dialog" title="文件下载企业统计" style="width:750px;height:auto;align:center;top:1px;"   
+    data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true">
+    <!--表头   根据企业名称查询开始-->
+	<div style="text-align: center;margin-top: 20px;">
+		<input id="sch_ep"  type="text"  style="width:300px;"  placeholder="此处输入企业名称，支持模糊查询"/> 
+		<button id="btn" class="easyui-linkbutton" style="width:50px;">搜索</button><br/><br/> 
+		<span style="color: #003366; font-size: 20px; font-weight:bold;">文件下载企业统计</span>
+	</div>
+	<!--表体-->				
+	<div style="width: 100%;" id="tab_filelist"></div>  
+</div>
+<!-- 公告结束 -->

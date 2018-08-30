@@ -1,0 +1,855 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<style type="text/css">
+body {
+		margin: 8px;
+		padding: 0;
+	}
+	.td_right{
+		width: 30%;
+	}
+	
+	.td_left{
+		background: #b6c1ca;
+		width:20%;
+		text-align: right;
+		height: 30px;
+	}
+	.xqtd_right{
+		width: 30%;
+		text-align: center;
+	}
+	
+	.xqtd_left{
+		background: #dee3e8;
+		width:20%;
+		text-align: right;
+		height: 30px;
+	}
+	 table tr td{
+		    border-right: solid 1px #c0cdd8;
+  			border-bottom: solid 1px #c0cdd8;
+			padding:3px 0;
+			font-size: 15px;
+	}
+	/* 设置datagrid表格td高度 */
+	.datagrid-btable tr td{
+		height: 30px;
+	}
+	.datagrid-htable{
+		/* border-top: solid 1px #c0cdd8; */
+	}
+	#td_left{
+		background: #D6E4F0;
+		width:20%;
+		text-align: right;
+		
+	}
+	 input{
+		padding:2px 0;
+		margin-left:2px;
+		border: #c0cdd8 1px solid;
+		outline-color:#c0cdd8 ;
+		width: 80%;
+		font-size: 15px;
+	}
+	ul li{
+		list-style-type:none;
+		line-height:30px;
+		float: left;
+		margin-left: 20px;
+		text-align: center;
+	}
+	a {font-size:15px} 
+	a:link {text-decoration:none;} //未访问：蓝色、无下划线 
+	
+</style>
+
+<html>
+<script type="text/javascript">
+	$(function() {
+			/* 页面自适应 */
+			$(window).resize(function () {
+	            $('#dg').datagrid('resize', {
+	                width: $(window).width() - 50,
+	            }).datagrid('resize', {
+	                width: $(window).width() - 50,
+	            });
+	        });
+	        
+	        /* 隐藏添加窗口 */
+			$('#tj').dialog('close');
+			$('#tom').dialog('close');
+			$('#xq').dialog('close');
+  			/* 验证session开始 */
+			var curPath = window.document.location.href;
+		 	var pathName = window.document.location.pathname;
+		 	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+		 	var s="<%=session.getAttribute("login_users")%>"; 
+		 	if(s=="null"){ 
+		 		top.location.href = location.href=basePath+"JRmanage";
+		 	}
+			/* 验证session结束 */
+			/* 为导出报表使用 */
+			$.ajax({
+				url: 'newepcar_list01.action',
+				data:{},
+				type:"post",
+			    dataType:"json",   
+				success: function(data) {
+					
+				}
+			});
+			
+			/* 列表展示 */
+			$("#dg").datagrid({
+					'url' : 'newepcar_list.action',//请求的地址
+					  fitColumns:true,//宽度自适应
+					'loadMsg' : '正在加载...',//加载时的提示
+					'rownumbers' : true,//显示行数
+					'pagination':true,
+					'singleSelect' : true,//只允许选择一行
+					//pageSize:20,
+					 toolbar: '#tb',
+					columns : [[{field:'style',title:'车辆类型',align:'center',width:8,
+					        	formatter: function(value,row,index){
+									return value.text;
+								}
+							},
+							{field:'carnumber',title:'车牌号',align:'center',width:8,},
+					        {field:'color',title:'车牌颜色',align:'center',width:6,},
+							{field : 'customerid',title : '所属公司',align:'center',width:20},
+							{field : 'people',title : '安装人',align:'center',width:8},
+							{field : 'newtime',title : '安装日期',align:'center',width:10},
+							{field : 'platform',title : '所属平台',align:'center',width:10},
+							{field : 'remark',title : '备注',align:'center',width:10},
+							{field : 'createtime',title : '记录时间',align:'center',width:10},
+							{field : 'null',title : '操作',align:'center',width:10,
+								formatter : function(value, row, index) {
+									   return "<a style='margin-right: 5px;margin-left: 15px;' href='javascript:del(" + row.id+ ");'>删除</a>"
+									  +"<a style='margin-right: 5px;margin-left: 15px;' href='javascript:show(" + row.id+ ");'>详情</a>";
+								}
+							}
+					]]
+			});
+			
+			//搜索框模糊查询
+			$('#btn').bind('click', function(){
+				var starttime = document.getElementById("starttime").value;
+				var endtime = document.getElementById("endtime").value;
+				var carnum = $('#carnum').val();
+				//把字符串格式转换为日期类
+				var startdate = new Date(Date.parse(starttime));
+				var enddate = new Date(Date.parse(endtime));
+				if(startdate > enddate){
+					$.messager.alert('提示','起始日期不能大于结束日期'); 
+				}else{
+				    
+				$.ajax({
+						url: 'newepcar_findBytime.action',
+						data:{carnumber:carnum,idStart:starttime,idEnd:endtime},
+						type:"post",
+					    dataType:"json",   
+						success: function(data) {
+							if(data.length == 0){
+								$.messager.alert('提示','根据查询条件，数据库无任何记录');
+							}else{
+								$('#dg').datagrid('reload',{carnumber:carnum,idStart:starttime,idEnd:endtime});//重新加载
+								/* 为导出报表使用 */
+								$.ajax({
+									url: 'newepcar_list01.action',
+									data:{carnumber:carnum,idStart:starttime,idEnd:endtime},
+									type:"post",
+								    dataType:"json",   
+									success: function(data) {
+										
+									}
+								});
+							}
+						}
+					});
+					
+					 
+				}
+			});
+			
+  	});
+  	//车辆增加
+  	function add(){
+  		//获取当前时间开始
+		var date = new Date();
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        var hh = date.getHours();            //时
+        var mm = date.getMinutes();          //分
+        var ss = date.getSeconds();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        if (hh >= 1 && hh <= 9) {
+            hh = "0" + hh;
+        }
+        if (mm >= 0 && mm <= 9) {
+            mm = "0" + mm;
+        }
+        if (ss >= 0 && ss <= 9) {
+            ss = "0" + ss;
+        }
+        var currentdate = year + seperator1 + month + seperator1 + strDate;
+        //获取当前时间结束
+        //初始化赋值
+        initCombox($('#tj #style'),'newepcar_findCarstyleList.action',null,-1);
+        $('#tj #djtime').datebox('setValue', currentdate);
+        $('#tj #newtime').datebox('setValue', currentdate);
+        initCombox03($('#people'),'persionfile_findPeople.action',null,-1);
+		//打开添加窗口
+		$('#tj').dialog('open');
+		
+		//选择公司
+		$('#tomer').on('click',function(){
+			$("#tomul").empty();
+			$.ajax({
+				url : 'customer_findTomers.action',
+				data:{},
+				dataType : 'json',
+				type : 'POST',
+				success : function(data) {
+					var html="";
+					for(var i=0;i<data.length;i++){
+						
+					        html='<li>'
+					        		+'<a href="javascript:void(0)" onclick="tomeradd(this)">'+data[i].name+'</a>'
+								+'</li>';
+		        			$("#tomul").append(html);
+                    }
+                    $('#tom').dialog('open');
+				}
+			});
+		});
+		//关闭选择公司窗口
+		$('#tom_add_dialog_btc').on('click',function(){
+			$('#tom').dialog('close');
+			
+		});
+		
+		//取消
+		$('#tb_user_add_dialog_btc').on('click',function(){
+			$('#tj').dialog('close');
+			window.location.reload();//重新载入当前页面
+		});
+		//你想在关闭时执行的代码
+		$('#tj').dialog({onClose:function(){
+			window.location.reload();//重新载入当前页面
+		}});
+  		//保存	
+		$('#tb_user_add_dialog_bts').on('click',function(){
+				$("#form").form("submit", {
+				    url:'newepcar_add.action',     
+				    success:function(data){  
+				    //将 data转换成json  原因：从后台传递过来的数据，都是字符串  
+				        var obj=$.parseJSON(data);
+				        if(obj.success){
+				       		$('#form').form('clear');//清除表单数据。
+							window.location.reload();//重新载入当前页面
+				        }
+				        $.messager.show({
+							title:'提示',
+							msg:obj.message,
+							timeout:1000,
+							style:{  
+								right:'',  
+								bottom:''  
+							}
+						});
+				    }    
+				});
+		});
+	}
+	function tomeradd(name){
+		var customer = null;
+		customer = $(name).text();
+		//确定选择公司
+		$('#tom_add_dialog_bts').on('click',function(){
+			$('#customerid').val(customer);
+			$('#tom').dialog('close');
+			
+		});
+	
+	}
+	//删除
+	function del(id){
+		$.messager.confirm('确认','您确认想要删除记录吗？',function(r){    
+		    if (r){    
+		        $.ajax({
+					url : 'newepcar_del.action',
+					data:{id:id},
+					dataType : 'json',
+					type : 'POST',
+					success : function(data) {
+						window.location.reload();//重新载入当前页面
+					}
+				});    
+		    }    
+		}); 
+	}
+	//详情
+	function show(id){
+		//根据id获取信息
+		$.ajax({
+			    url : 'newepcar_findById.action',
+			    type : "post",
+			    data:{id:id},
+			    dataType : "json",  
+			    success : function(data)  { 
+					//打开对话框
+					$("#xq").dialog('open');
+					$('#xq #style').html(data.style.text);
+					$('#xq #customerid').html(data.customerid);
+					$('#xq #carnumber').html(data.carnumber);
+					$('#xq #color').html(data.color);
+					$('#xq #brandmodel').html(data.brandmodel);
+					$('#xq #enumber').html(data.enumber);
+					$('#xq #cnumber').html(data.cnumber);
+					$('#xq #djtime').html(data.djtime);
+					$('#xq #lnumber').html(data.lnumber);
+					$('#xq #opernumber').html(data.opernumber);
+					$('#xq #driver').html(data.driver);
+					$('#xq #driverphone').html(data.driverphone);
+					$('#xq #ecard').html(data.ecard);
+					$('#xq #management').html(data.management);
+					$('#xq #snumber').html(data.snumber);
+					$('#xq #dnumber').html(data.dnumber);
+					$('#xq #headman').html(data.headman);
+					$('#xq #hphone').html(data.hphone);
+					$('#xq #people').html(data.people);
+					$('#xq #newtime').html(data.newtime);
+					$('#xq #zhnumber').html(data.zhnumber);
+					$('#xq #travelcard').html(data.travelcard);
+					$('#xq #transcard').html(data.transcard);
+					$('#xq #qcard').html(data.qcard);
+					$('#xq #asccenter').html(data.asccenter);
+					$('#xq #transport').html(data.transport);
+					$('#xq #newnumber').html(data.newnumber);
+					$('#xq #platform').html(data.platform);
+					$('#xq #remark').html(data.remark);
+					//取消
+					$('#tb_user_xq_dialog_btc').on('click',function(){
+						$('#xq').dialog('close');
+						window.location.reload();//重新载入当前页面
+					});
+					$('#xq').dialog({onClose:function(){
+				  			 //你想在关闭时执行的代码
+						window.location.reload();//重新载入当前页面
+					}});
+			 },
+		});
+	}
+</script>
+	   
+	  
+<body>
+	<!-- 列表 -->
+	<table id="dg" ></table> 
+	<!-- 列表 -->
+	<!-- 添加开始 -->
+   	<div style="display: none;">
+		<div id="tj" class="easyui-dialog" title="新装车辆信息添加"
+			style="width:900px;height:atuo;padding:25px 25px 50px 25px;top:15px;"
+			data-options="iconCls:'icon-save',resizable:true,modal:true,
+	        buttons:'#tb_user_add_dialog_bt'">
+			<form method="post" id="form" enctype="multipart/form-data"
+				style="margin-top: 15px; margin-left: 15px;">
+				<input type="hidden" name="id" id="id" value="0">
+					<div style="width: 100%;">
+						<table style="width: 96%;margin-left:2%;border: solid 1px #c0cdd8;border-right: none;border-bottom: none;" cellpadding="1" cellspacing="0">
+								<tr>
+									<td class="td_left">车辆类型:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="style" editable="false" name="style.id" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     
+										</select>
+									</td>
+									<td class="td_left">所属公司:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="customerid" name="customerid"  type="text" style="width:64%;" >
+										<div id="tomer" style="float: right;border-radius:3px; width: 75px;text-align:center;height: 25px;line-height:25px;margin-right:3px;border: none; background:#d5e0e8;">选择公司</div>
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">车牌号码:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="carnumber" name="carnumber"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">车牌颜色:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="color" editable="false" name="color" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     	<option value="蓝色">蓝色</option>
+									    	<option value="黄色">黄色</option>
+									    	<option value="绿色">绿色</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">品牌型号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="brandmodel" name="brandmodel"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">发动机号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="enumber" name="enumber"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">车架号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="cnumber" name="cnumber"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">车辆登记日期:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="djtime" name="djtime" editable="false" type="text" style="width:206px;height: 25px;maxHeight:300px" class="easyui-datebox" value="1">
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">荷载人数:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="lnumber" name="lnumber"  type="number" min="0" style="width:87%;" >
+									</td>
+									<td class="td_left">营运证号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="opernumber" name="opernumber"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">驾驶员:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="driver" name="driver"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">驾驶员电话:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="driverphone" name="driverphone"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">从业资格证:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="ecard" name="ecard"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">经营范围:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="management" name="management"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">SIM卡号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="snumber" name="snumber"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">顶灯编号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="dnumber" name="dnumber"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">负责人:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="headman" name="headman"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">负责人电话:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="hphone" name="hphone"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">安装人:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="people" editable="false" name="people" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     
+										</select>
+									</td>
+									<td class="td_left">安装日期:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="newtime" name="newtime" editable="false" type="text" style="width:206px;height: 25px;maxHeight:300px" class="easyui-datebox" value="1">
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">终端编号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right" colspan="3">
+										<input id="zhnumber" name="zhnumber"  type="text" style="width:32.5%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">行驶证资料:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="travelcard" editable="false" name="travelcard" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     	<option value="齐全">齐全</option>
+									    	<option value="不齐">不齐</option>
+										</select>
+									</td>
+									<td class="td_left">道路运输证资料:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="transcard" editable="false" name="transcard" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     	<option value="齐全">齐全</option>
+									    	<option value="不齐">不齐</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">资格证资料:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="qcard" editable="false" name="qcard" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     	<option value="齐全">齐全</option>
+									    	<option value="不齐">不齐</option>
+										</select>
+									</td>
+									<td class="td_left">归属企业资料:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<select id="asccenter" editable="false" name="asccenter" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     	<option value="齐全">齐全</option>
+									    	<option value="不齐">不齐</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">运管所资料:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right" colspan="3">
+										<select id="transport" editable="false" name="transport" class="easyui-combobox" style="width:206px;height: 25px;margin-left: 15px;">   
+									     	<option value="齐全">齐全</option>
+									    	<option value="不齐">不齐</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">安装单编号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="newnumber" name="newnumber"  type="text" style="width:87%;" >
+									</td>
+									<td class="td_left">所属平台:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="platform" name="platform"  type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">备注:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right" colspan="3">
+										<input id="remark" name="remark"  type="text" style="width:62.5%;" >
+									</td>
+								</tr>
+							</table>
+					</div>
+			</form>
+		</div>
+		<div id="tb_user_add_dialog_bt">
+			<a id="tb_user_add_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-save',">保存</a>
+			<a id="tb_user_add_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+		</div>
+	</div> 
+	<!-- 添加结束 -->
+	<!-- 选择公司开始 -->
+	<div style="display: none;">
+		<div id="tom" class="easyui-dialog" title="选择公司"
+			style="width:1000px;height:atuo;padding:25px 25px 50px 25px;top:15px;"
+			data-options="iconCls:'icon-save',resizable:true,modal:true,
+	        buttons:'#tom_add_dialog_bt'">
+			<div style="width: 100%; height: auto;">
+				<ul id="tomul" style="width: 100%; height: auto;">
+				
+				</ul>
+			</div>
+		</div>
+		<div id="tom_add_dialog_bt">
+			<a id="tom_add_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-save',">确定</a>
+			<a id="tom_add_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+		</div>
+	</div> 
+	<!-- 选择公司结束 -->
+	<!-- 详情开始 -->
+   	<div style="display: none;">
+		<div id="xq" class="easyui-dialog" title="新装车辆信息详情"
+			style="width:900px;height:atuo;padding:25px 25px 50px 25px;top:15px;"
+			data-options="iconCls:'icon-save',resizable:true,modal:true,
+	        buttons:'#tb_user_xq_dialog_bt'">
+			<form method="post" id="form" enctype="multipart/form-data"
+				style="margin-top: 15px; margin-left: 15px;">
+				<input type="hidden" name="id" id="id" value="0">
+					<div style="width: 100%;">
+						<table style="width: 96%;margin-left:2%;border: solid 1px #c0cdd8;border-right: none;border-bottom: none;" cellpadding="1" cellspacing="0">
+								<tr>
+									<td class="xqtd_left">车辆类型:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="style">
+									</td>
+									<td class="xqtd_left">所属公司:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="customerid">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">车牌号码:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="carnumber">
+									</td>
+									<td class="xqtd_left">车牌颜色:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="color">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">品牌型号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="brandmodel">
+									</td>
+									<td class="xqtd_left">发动机号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="enumber">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">车架号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="cnumber">
+									</td>
+									<td class="xqtd_left">车辆登记日期:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="djtime">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">荷载人数:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="lnumber">
+									</td>
+									<td class="xqtd_left">营运证号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="opernumber">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">驾驶员:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="driver">
+									</td>
+									<td class="xqtd_left">驾驶员电话:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="driverphone">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">从业资格证:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="ecard">
+									</td>
+									<td class="xqtd_left">经营范围:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="management">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">SIM卡号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="snumber">
+									</td>
+									<td class="xqtd_left">顶灯编号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="dnumber">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">负责人:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="headman">
+									</td>
+									<td class="xqtd_left">负责人电话:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="hphone">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">安装人:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="people">
+									</td>
+									<td class="xqtd_left">安装日期:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="newtime">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">终端编号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="zhnumber">
+									</td>
+									<td class="xqtd_left">运管所资料:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="transport">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">行驶证资料:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="travelcard">
+									</td>
+									<td class="xqtd_left">道路运输证资料:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="transcard">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">资格证资料:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="qcard">
+									</td>
+									<td class="xqtd_left">归属企业资料:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="asccenter">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">安装单编号:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="newnumber">
+									</td>
+									<td class="xqtd_left">所属平台:
+										<font color="red">*</font>
+									</td>
+									<td class="xqtd_right" id="platform">
+									</td>
+								</tr>
+								<tr>
+									<td class="xqtd_left">备注:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right" id="remark" colspan="3">
+									</td>
+								</tr>
+							</table>
+					</div>
+			</form>
+		</div>
+		<div id="tb_user_xq_dialog_bt">
+			<a id="tb_user_xq_dialog_btc" class="easyui-linkbutton">关闭</a>
+		</div>
+	</div> 
+	<!-- 详情结束 -->
+	<!-- 模糊查询开始 -->
+	<div id="tb">
+		<div style="margin-left: 25px; height: 45px; float: left;">
+			<div style="margin-top: 8px;">
+				<a href="javascript:add()" id="tb_user_add" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+				<div class="datagrid-btn-separator"></div> 
+			</div>
+		</div>
+		<div style="margin-left: 25px; height: 30px;float: left;">
+			<table>
+				<tr>
+					<td style="border-left: solid 1px #c0cdd8;">
+						<div>
+							车牌号码<input id="carnum" placeholder="车牌号码" style="width:200px; border: #ABCDEF 1px solid;outline-color:#96c4f3 ;"></input>&nbsp;&nbsp;&nbsp;
+							起始时间：<input id="starttime"  type="text"  style="width:200px; height:90%; border: #ABCDEF 1px solid;outline-color:#96c4f3 ;"  placeholder="起始时间" class="Wdate" onfocus="WdatePicker({lang:'zh-cn',skin:'whyGreen',dateFmt:'yyyy-MM-dd'})"/>&nbsp;------
+							结束时间：<input id="endtime"  type="text"  style="width:200px; height:90%; border: #ABCDEF 1px solid;outline-color:#96c4f3 ;"  placeholder="结束时间" class="Wdate" onfocus="WdatePicker({lang:'zh-cn',skin:'whyGreen',dateFmt:'yyyy-MM-dd'})"/>
+							<button id="btn" class="easyui-linkbutton" style="width:50px;">搜索</button>
+						</div>
+					</td>
+					<td>
+						<!-- 导出报表 -->
+						<a href="newepcar_exportExcel.action" style="text-decoration: none;">
+					    	<button id="export" style="width: 80px;height: 35px;border: none; background:#d5e0e8;margin-left: 10px;">导出报表</button>
+					    </a>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div> 
+	<!-- 模糊查询结束 -->
+</body>
+
+</html>

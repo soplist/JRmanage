@@ -1,0 +1,88 @@
+package com.bureau.biz.impl;
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.CustomerBiz;
+import com.bureau.biz.PubliccarBiz;
+import com.bureau.dao.CustomerDao;
+import com.bureau.dao.PubliccarDao;
+import com.bureau.pojo.Customer;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Publiccar;
+
+public class CustomerBizImpl implements CustomerBiz {
+	//注入Dao
+	private CustomerDao customerDao;
+	
+	public void setCustomerDao(CustomerDao customerDao) {
+		this.customerDao = customerDao;
+	}
+	//分页查询
+	public PageData<Customer> findAll(Customer cu) {
+		String hql="from Customer p";
+		String counthql="select count(p.id) from Customer p";
+		Map<String, Object> params=new HashMap<String, Object>();
+		//模糊查询追加条件
+		if(cu.getName()!=null){
+			hql+=" where p.name like :name";
+			counthql+=" where p.name like :name";
+			params.put("name", "%"+cu.getName()+"%");
+		}
+		hql+=" order by p.id asc";
+		System.out.println("hql--"+hql);
+		//查询所有用户
+		List<Customer> pus = customerDao.list(hql, params,
+				(cu.getPage()-1)*cu.getRows(),cu.getRows());
+		PageData<Customer> prr=new PageData<Customer>();
+		//查询用户的数量
+		Integer total = customerDao.count(counthql, params);
+		//放入pageDate
+		prr.setRows(pus);
+		prr.setTotal(total);
+		return prr;
+	}
+	
+	public PageData<Customer> findAllByStyle(Customer cu) {
+		String hql="from Customer p";
+		String counthql="select count(p.id) from Customer p";
+		Map<String, Object> params=new HashMap<String, Object>();
+		if(cu.getStyle()!=null){
+		    hql+=" where p.style = :style";
+		    counthql+=" where p.style = :style";
+		    params.put("style", cu.getStyle());
+		}
+		
+		hql+=" order by p.id asc";
+		System.out.println("hql--"+hql);
+		//查询所有用户
+		List<Customer> pus = customerDao.list(hql, params,
+				(cu.getPage()-1)*cu.getRows(),cu.getRows());
+		PageData<Customer> prr=new PageData<Customer>();
+		//查询用户的数量
+		Integer total = customerDao.count(counthql, params);
+		//放入pageDate
+		prr.setRows(pus);
+		prr.setTotal(total);
+		return prr;
+	}
+	//增加
+	public boolean add(Customer cu) {
+		return customerDao.add(cu);
+	}
+	//修改
+	public boolean upd(Customer cu) {
+		return customerDao.upd(cu);
+	}
+	//删除
+	public boolean del(Customer cu) {
+		return customerDao.del(cu);
+	}
+	//根据ID查询
+	public Customer findById(int id) {
+		return customerDao.get(id);
+	}
+		
+}

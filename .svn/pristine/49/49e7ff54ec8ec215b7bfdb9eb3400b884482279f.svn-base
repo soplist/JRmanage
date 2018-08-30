@@ -1,0 +1,115 @@
+package com.bureau.pojo;
+
+/**
+ * Privatecar entity. @author MyEclipse Persistence Tools
+ */
+
+public class Privatecar implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String carnumber;
+	private Integer peopleid;
+	private String yearcheck;
+	private Double output;
+	private String buytime;
+	private String brand;
+	private String insurance;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Privatecar() {
+	}
+
+	/** full constructor */
+	public Privatecar(String carnumber, Integer peopleid, String yearcheck,
+			Double output, String buytime, String brand, String insurance,
+			String create) {
+		this.carnumber = carnumber;
+		this.peopleid = peopleid;
+		this.yearcheck = yearcheck;
+		this.output = output;
+		this.buytime = buytime;
+		this.brand = brand;
+		this.insurance = insurance;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getCarnumber() {
+		return this.carnumber;
+	}
+
+	public void setCarnumber(String carnumber) {
+		this.carnumber = carnumber;
+	}
+
+	public Integer getPeopleid() {
+		return this.peopleid;
+	}
+
+	public void setPeopleid(Integer peopleid) {
+		this.peopleid = peopleid;
+	}
+
+	public String getYearcheck() {
+		return this.yearcheck;
+	}
+
+	public void setYearcheck(String yearcheck) {
+		this.yearcheck = yearcheck;
+	}
+
+	public Double getOutput() {
+		return this.output;
+	}
+
+	public void setOutput(Double output) {
+		this.output = output;
+	}
+
+	public String getBuytime() {
+		return this.buytime;
+	}
+
+	public void setBuytime(String buytime) {
+		this.buytime = buytime;
+	}
+
+	public String getBrand() {
+		return this.brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
+	public String getInsurance() {
+		return this.insurance;
+	}
+
+	public void setInsurance(String insurance) {
+		this.insurance = insurance;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

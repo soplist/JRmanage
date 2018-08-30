@@ -1,0 +1,130 @@
+package com.bureau.pojo;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * QUser entity. @author MyEclipse Persistence Tools
+ */
+
+public class QUser implements java.io.Serializable {
+
+
+	private Integer id;
+	private String lname;
+	private String lpass;
+	private String rname;
+	private String phone;
+	private Dictionary dpart;
+	private Integer isdisable;
+	private Set QRoles = new HashSet(0);
+	
+	public Set getQRoles() {
+		return QRoles;
+	}
+	public void setQRoles(Set qRoles) {
+		QRoles = qRoles;
+	}
+	// Constructors
+
+	/** default constructor */
+	public QUser() {
+	}
+	//分页属性,不做映射
+		private Integer page;//表示当前是第几页
+		private Integer rows;//每页显示多少条记录
+		//角色授权专用
+		private String rids;
+		
+		public String getRids() {
+			return rids;
+		}
+		public void setRids(String rids) {
+			this.rids = rids;
+		}
+		// Constructors
+		public Integer getPage() {
+			return page;
+		}
+		public void setPage(Integer page) {
+			this.page = page;
+		}
+		public Integer getRows() {
+			return rows;
+		}
+		public void setRows(Integer rows) {
+			this.rows = rows;
+		}
+	
+
+	/** full constructor */
+	public QUser(String lname, String lpass, String rname, String phone,
+			Dictionary dpart, Integer isdisable, Set qRoles) {
+		this.lname = lname;
+		this.lpass = lpass;
+		this.rname = rname;
+		this.phone = phone;
+		this.dpart = dpart;
+		this.isdisable = isdisable;
+		QRoles = qRoles;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getLname() {
+		return this.lname;
+	}
+
+	public void setLname(String lname) {
+		this.lname = lname;
+	}
+
+	public String getLpass() {
+		return this.lpass;
+	}
+
+	public void setLpass(String lpass) {
+		this.lpass = lpass;
+	}
+
+	public String getRname() {
+		return this.rname;
+	}
+
+	public void setRname(String rname) {
+		this.rname = rname;
+	}
+
+	public String getPhone() {
+		return this.phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public Dictionary getDpart() {
+		return this.dpart;
+	}
+
+	public void setDpart(Dictionary dpart) {
+		this.dpart = dpart;
+	}
+
+	public Integer getIsdisable() {
+		return this.isdisable;
+	}
+
+	public void setIsdisable(Integer isdisable) {
+		this.isdisable = isdisable;
+	}
+
+}

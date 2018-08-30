@@ -1,0 +1,287 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<!--添加echart图表插件 by 李金 --> 
+<script src="resource/echarts/echarts.min.js" type="text/javascript"></script>
+<script src="resource/echarts/jquery.min.js" type="text/javascript"></script>
+<style type="text/css">
+	 table tr td{
+			padding:3px 0;
+			height: 40px;
+			font-size: 18px;
+	}
+</style>
+<script type="text/javascript">
+$(function(){
+/* 页面自适应 */
+	$(window).resize(function () {
+	      $('#dg').datagrid('resize', {width: $(window).width() - 50,}).datagrid('resize', {
+	      width: $(window).width() - 50,});
+	 });
+	/* 验证session开始 */
+	var curPath = window.document.location.href;
+	var pathName = window.document.location.pathname;
+	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+	var s="<%=session.getAttribute("login_users")%>"; 
+	if(s=="null"){ 
+	 	top.location.href = location.href=basePath+"JRmanage";
+	}
+	//获取当前年月
+	var time='';
+	var myday=new Date();
+    myday.toLocaleDateString();
+    time += myday.getFullYear()+'年';    //获取年
+    time += myday.getMonth()+1+'月';    //获取月
+    document.getElementById('timeshow').innerHTML=time
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //搜索框模糊查询
+	$('#checkd').bind('click', function(){
+		var starttime = document.getElementById("starttime").value;
+		var endtime = document.getElementById("endtime").value;
+		//把字符串格式转换为日期类
+		var startdate = new Date(Date.parse(starttime));
+		var enddate = new Date(Date.parse(endtime));
+		if(starttime == "" || endtime == ""){
+			alert('提示:请输入查询日期'); 
+		}else if(startdate > enddate){
+			alert('提示:起始日期不能大于结束日期'); 
+		}else{
+		    var idStart="",idEnd="";
+			$.ajax({
+				url: 'usecarsum_findAllSum.action',
+				data:{idStart:starttime,idEnd:endtime},
+				type:"post",
+			    dataType:"json",   
+				success: function(data) {
+					if(data.length == 0){
+						alert('提示:根据查询条件，数据库无任何记录');
+					}else{                  
+					    $("#tab_append").empty();
+						var htm = "";
+						for(var i =0;i<data.length;i++){
+						htm += '<tr style="font-weight:normal;font-size: 16px;">'+
+				            '<td style="text-align: center;">'+(i+1)+'</td>'+    
+							'<td style="text-align: center;">'+data[i].carnumber+'</td>'+
+							'<td style="text-align: center;">'+data[i].usenum+'</td>'+
+							'<td style="text-align: center;">'+data[i].km+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneykm+'</td>'+
+							'<td style="text-align: center;">'+data[i].lastkm+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneypay+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneygas+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneylast+'</td>'+
+							'<td style="text-align: center;">'+data[i].starttime+'</td>'+
+							'<td style="text-align: center;">'+data[i].endtime+'</td>'+
+						 '</tr>'
+						}
+						$("#tab_append").append(htm);
+					}
+					car_echarts();
+				}
+			});
+				 
+		}
+	});
+});
+
+function car_echarts(){
+	//###############柱状统计图    
+   var myChart = echarts.init(document.getElementById('main'));
+    option = {
+    title : {
+        text: '公司用车统计',
+        subtext: '金瑞',
+    },
+    tooltip : {},
+    legend: {  
+     	orient: 'horizontal', 
+        x:'center',
+        padding: 10,
+        data:['行驶里程','成本金额','充值金额','加油金额'] 
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    xAxis : [
+        { 	type : 'category', 
+        	data : [] ,
+        	axisLabel :{  interval:0, rotate:-10  } //制显示所有标签
+        }
+    ],
+    yAxis :{} ,
+    series : [
+        {
+            name:'行驶里程',
+            type:'bar',
+            data:[],
+            //顶部数字展示pzr
+		    itemStyle: { normal: { label: { show:true, position: 'top' } } }
+        },
+        {
+            name:'成本金额',
+            type:'bar',
+            data:[],
+            //顶部数字展示pzr
+		    itemStyle: { normal: { label: { show:true, position: 'top' } } }
+        },
+         {
+            name:'充值金额',
+            type:'bar',
+            data:[],
+            //顶部数字展示pzr
+		    itemStyle: { normal: { label: { show:true, position: 'top' } } }
+        },
+         {
+            name:'加油金额',
+            type:'bar',
+            data:[],
+            //顶部数字展示pzr
+		    itemStyle: { normal: { label: { show:true, position: 'top' } } }
+        }
+    ]
+    };
+    myChart.setOption(option); 
+    
+    var names=[];    //类别数组（实际用来盛放X轴坐标值）
+    var nums1=[];    //销量数组（实际用来盛放Y坐标值）
+    var nums2=[];    //销量数组（实际用来盛放Y坐标值）
+    var nums3=[];    //销量数组（实际用来盛放Y坐标值）
+    var nums4=[];    //销量数组（实际用来盛放Y坐标值）
+    $.ajax({
+		url: 'usecarsum_findAllSum01.action',
+		data:{},
+		type:"post",
+		dataType:"json",   
+		success: function(data) {
+			if(data){
+         		for(var i=0;i<data.length;i++){       
+                      names.push(data[i].carnumber);    //挨个取出类别并填入类别数组
+                }
+                for(var i=0;i<data.length;i++){ //挨个取出类别并填入类别数组        
+                      nums1.push(data[i].km);        
+                      nums2.push(data[i].moneykm); 
+                      nums3.push(data[i].moneypay);
+                      nums4.push(data[i].moneygas);
+                }
+                 myChart.setOption({        //加载数据图表
+                        xAxis: {
+                            data: names
+                        },
+                        series: [
+                            {
+                            // 根据名字对应到相应的系列
+                            name: '行驶里程',
+                            data: nums1
+                            },
+                            {
+                            // 根据名字对应到相应的系列
+                            name: '成本金额',
+                            data: nums2
+                            },
+                            {
+                            // 根据名字对应到相应的系列
+                            name: '充值金额',
+                            data: nums3
+                            },
+                            {
+                            // 根据名字对应到相应的系列
+                            name: '加油金额',
+                            data: nums4
+                            }
+                        ]
+                 }); 
+         	}
+		},
+         error : function(errorMsg) {
+             //请求失败时执行该函数
+             alert("图表请求数据失败!");
+         }
+	}); 	 
+}
+
+$(document).ready(function(){
+	$.ajax({
+		url:'usecarsum_findAllSum.action',
+		data:{},
+		type:"post",
+		dataType:"json",
+		success:function(data){
+			if(data.length > 0){
+				var htm = "";
+				for(var i =0;i<data.length;i++){
+				htm += '<tr style="font-weight:normal;font-size: 16px;">'+
+				            '<td style="text-align: center;">'+(i+1)+'</td>'+    
+							'<td style="text-align: center;">'+data[i].carnumber+'</td>'+
+							'<td style="text-align: center;">'+data[i].usenum+'</td>'+
+							'<td style="text-align: center;">'+data[i].km+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneykm+'</td>'+
+							'<td style="text-align: center;">'+data[i].lastkm+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneypay+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneygas+'</td>'+
+							'<td style="text-align: center;">'+data[i].moneylast+'</td>'+
+							'<td style="text-align: center;">'+data[i].starttime+'</td>'+
+							'<td style="text-align: center;">'+data[i].endtime+'</td>'+
+						 '</tr>'
+				}
+				$("#tab_append").append(htm);
+			}
+			car_echarts();
+		}
+	})
+});
+</script>
+
+<body>
+<h1><div id="timeshow" style="font-weight:border;font-family:黑体;text-align: center;"></div></h1>
+<!-- 查询搜索栏 -->
+<div style="width: 100%;height:60px;margin-bottom: 2px;margin-top: 1%;">
+	<div style="width: 30%;background: #F3F3F3;height: 40px;float: left;overflow: hidden;">
+		<span style="width: 20%; height: 40px;line-height: 40px;display: block;text-align: center;float: left;">阶段开始</span>
+		<input id="starttime" type="text" value="" placeholder="开始时间" onclick="WdatePicker()" style="width: 28%;height: 40px; display: block; border: none;outline: none;background: #F0F0F0;float: left;"/>
+		<input id="endtime" type="text" value="" placeholder="结束时间" onclick="WdatePicker()" style="width: 28%;height: 40px; display: block;border: none;outline: none;background: #F0F0F0;float: right;"/>
+		<span style="width: 20%; height: 40px;line-height: 40px;display: block;text-align: center;float: right;">阶段结束</span>
+	</div>
+	<div style="width: 50%;float: right;height: 40px;overflow: hidden;">
+	    <a href="usecarsum_exportExcel.action" style="text-decoration: none;">
+	    	<button id="export" style="width: 80px;height: 40px;border: none; background:#F0F0F0;float: right;margin-right: 15px;">导出报表</button>
+	    </a>
+		<button id="checkd" style="width: 80px;height: 40px;border: none; background:#F0F0F0;float: right;margin-right: 15px;">阶段查询</button>
+	</div>
+</div>
+
+<!-- 用户数据表格 -->
+<div id="ucs_list" style="text-align: center;">
+	<span style="color: #003366; font-size: 20px; font-weight:bold;margin-top: 20px;">用车统计表</span>	
+	<table style="width: 100%;" border="1" cellspacing="0" cellpadding="0" >
+		<!--表头-->
+		<thead>
+		<tr style="font-family:SimHei;font-weight:blod;">
+		    <td id="title" style="text-align: center; ">序号</td>
+			<td id="title" style="text-align: center; ">车牌号码</td>
+			<td id="title" style="text-align: center; ">行车次数</td>
+			<td id="title" style="text-align: center; ">行驶里程</td>
+			<td id="title" style="text-align: center; ">金额</td>
+			<td id="title" style="text-align: center; ">最后公里数</td>
+			<td id="title" style="text-align: center; ">充值金额</td>
+			<td id="title" style="text-align: center; ">加油金额</td>
+			<td id="title" style="text-align: center; ">油卡余额</td>
+			<td id="title" style="text-align: center; ">起始时间</td>
+			<td id="title" style="text-align: center; ">结束时间</td>
+		</tr>
+		</thead>
+		<!--表体-->	
+		<tbody id="tab_append" >
+		</tbody>
+	</table>
+</div><br>
+
+<!-- 柱状统计图 -->
+<div id="main" style="width:80%;height:70%;margin-left: 8%;"></div>
+</body>
+

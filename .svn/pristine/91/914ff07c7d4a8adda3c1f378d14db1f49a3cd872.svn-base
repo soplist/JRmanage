@@ -1,0 +1,176 @@
+package com.bureau.pojo;
+
+/**
+ * Oldepcar entity. @author MyEclipse Persistence Tools
+ */
+
+public class Oldepcar implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String style;
+	private Integer customerid;
+	private String carnumber;
+	private String cnumber;
+	private String snumber;
+	private String epdate;
+	private String transnumber;
+	private String reason;
+	private String source;
+	private String remark1;
+	private String remark2;
+	private String system;
+	private String remark;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Oldepcar() {
+	}
+
+	/** full constructor */
+	public Oldepcar(String style, Integer customerid, String carnumber,
+			String cnumber, String snumber, String epdate, String transnumber,
+			String reason, String source, String remark1, String remark2,
+			String system, String remark, String create) {
+		this.style = style;
+		this.customerid = customerid;
+		this.carnumber = carnumber;
+		this.cnumber = cnumber;
+		this.snumber = snumber;
+		this.epdate = epdate;
+		this.transnumber = transnumber;
+		this.reason = reason;
+		this.source = source;
+		this.remark1 = remark1;
+		this.remark2 = remark2;
+		this.system = system;
+		this.remark = remark;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getStyle() {
+		return this.style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+	public Integer getCustomerid() {
+		return this.customerid;
+	}
+
+	public void setCustomerid(Integer customerid) {
+		this.customerid = customerid;
+	}
+
+	public String getCarnumber() {
+		return this.carnumber;
+	}
+
+	public void setCarnumber(String carnumber) {
+		this.carnumber = carnumber;
+	}
+
+	public String getCnumber() {
+		return this.cnumber;
+	}
+
+	public void setCnumber(String cnumber) {
+		this.cnumber = cnumber;
+	}
+
+	public String getSnumber() {
+		return this.snumber;
+	}
+
+	public void setSnumber(String snumber) {
+		this.snumber = snumber;
+	}
+
+	public String getEpdate() {
+		return this.epdate;
+	}
+
+	public void setEpdate(String epdate) {
+		this.epdate = epdate;
+	}
+
+	public String getTransnumber() {
+		return this.transnumber;
+	}
+
+	public void setTransnumber(String transnumber) {
+		this.transnumber = transnumber;
+	}
+
+	public String getReason() {
+		return this.reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getRemark1() {
+		return this.remark1;
+	}
+
+	public void setRemark1(String remark1) {
+		this.remark1 = remark1;
+	}
+
+	public String getRemark2() {
+		return this.remark2;
+	}
+
+	public void setRemark2(String remark2) {
+		this.remark2 = remark2;
+	}
+
+	public String getSystem() {
+		return this.system;
+	}
+
+	public void setSystem(String system) {
+		this.system = system;
+	}
+
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

@@ -1,0 +1,197 @@
+package com.bureau.pojo;
+
+/**
+ * Newepcar entity. @author MyEclipse Persistence Tools
+ */
+
+public class Newepcar implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String style;
+	private Integer customerid;
+	private String carnumber;
+	private String color;
+	private String cnumber;
+	private String snumber;
+	private String jnumber;
+	private String dnumber;
+	private String zhnumber;
+	private Integer headmanid;
+	private String phone;
+	private Integer peopleid;
+	private String newdate;
+	private String newnumber;
+	private String remark;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Newepcar() {
+	}
+
+	/** full constructor */
+	public Newepcar(String style, Integer customerid, String carnumber,
+			String color, String cnumber, String snumber, String jnumber,
+			String dnumber, String zhnumber, Integer headmanid, String phone,
+			Integer peopleid, String newdate, String newnumber, String remark,
+			String create) {
+		this.style = style;
+		this.customerid = customerid;
+		this.carnumber = carnumber;
+		this.color = color;
+		this.cnumber = cnumber;
+		this.snumber = snumber;
+		this.jnumber = jnumber;
+		this.dnumber = dnumber;
+		this.zhnumber = zhnumber;
+		this.headmanid = headmanid;
+		this.phone = phone;
+		this.peopleid = peopleid;
+		this.newdate = newdate;
+		this.newnumber = newnumber;
+		this.remark = remark;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getStyle() {
+		return this.style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+	public Integer getCustomerid() {
+		return this.customerid;
+	}
+
+	public void setCustomerid(Integer customerid) {
+		this.customerid = customerid;
+	}
+
+	public String getCarnumber() {
+		return this.carnumber;
+	}
+
+	public void setCarnumber(String carnumber) {
+		this.carnumber = carnumber;
+	}
+
+	public String getColor() {
+		return this.color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	public String getCnumber() {
+		return this.cnumber;
+	}
+
+	public void setCnumber(String cnumber) {
+		this.cnumber = cnumber;
+	}
+
+	public String getSnumber() {
+		return this.snumber;
+	}
+
+	public void setSnumber(String snumber) {
+		this.snumber = snumber;
+	}
+
+	public String getJnumber() {
+		return this.jnumber;
+	}
+
+	public void setJnumber(String jnumber) {
+		this.jnumber = jnumber;
+	}
+
+	public String getDnumber() {
+		return this.dnumber;
+	}
+
+	public void setDnumber(String dnumber) {
+		this.dnumber = dnumber;
+	}
+
+	public String getZhnumber() {
+		return this.zhnumber;
+	}
+
+	public void setZhnumber(String zhnumber) {
+		this.zhnumber = zhnumber;
+	}
+
+	public Integer getHeadmanid() {
+		return this.headmanid;
+	}
+
+	public void setHeadmanid(Integer headmanid) {
+		this.headmanid = headmanid;
+	}
+
+	public String getPhone() {
+		return this.phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public Integer getPeopleid() {
+		return this.peopleid;
+	}
+
+	public void setPeopleid(Integer peopleid) {
+		this.peopleid = peopleid;
+	}
+
+	public String getNewdate() {
+		return this.newdate;
+	}
+
+	public void setNewdate(String newdate) {
+		this.newdate = newdate;
+	}
+
+	public String getNewnumber() {
+		return this.newnumber;
+	}
+
+	public void setNewnumber(String newnumber) {
+		this.newnumber = newnumber;
+	}
+
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}

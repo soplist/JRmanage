@@ -1,0 +1,64 @@
+package com.bureau.biz.impl;
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.CarrecordBiz;
+import com.bureau.biz.PrivatecarBiz;
+import com.bureau.dao.CarrecordDao;
+import com.bureau.dao.PrivatecarDao;
+import com.bureau.pojo.Carrecord;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Privatecar;
+
+public class CarrecordBizImpl implements CarrecordBiz {
+	//注入Dao
+	private CarrecordDao carrecordDao;
+	
+	public void setCarrecordDao(CarrecordDao carrecordDao) {
+		this.carrecordDao = carrecordDao;
+	}
+	//分页查询
+	public PageData<Carrecord> findAll(Carrecord ca) {
+		String hql="from Carrecord p";
+		String counthql="select count(p.id) from Carrecord p";
+		Map<String, Object> params=new HashMap<String, Object>();
+		//模糊查询追加条件
+		if(ca.getCarid()!=null){
+			hql+=" where p.carid like :carid";
+			counthql+=" where p.carid like :carid";
+			params.put("carid", "%"+ca.getCarid()+"%");
+		}
+		hql+=" order by p.id asc";
+		System.out.println("hql--"+hql);
+		//查询所有用户
+		List<Carrecord> prs = carrecordDao.list(hql, params,
+				(ca.getPage()-1)*ca.getRows(),ca.getRows());
+		PageData<Carrecord> prr=new PageData<Carrecord>();
+		//查询用户的数量
+		Integer total = carrecordDao.count(counthql, params);
+		//放入pageDate
+		prr.setRows(prs);
+		prr.setTotal(total);
+		return prr;
+	}
+	//增加
+	public boolean add(Carrecord ca) {
+		return carrecordDao.add(ca);
+	}
+	//修改
+	public boolean upd(Carrecord ca) {
+		return carrecordDao.upd(ca);
+	}
+	//删除
+	public boolean del(Carrecord ca) {
+		return carrecordDao.del(ca);
+	}
+	//根据ID查询
+	public Carrecord findById(int id) {
+		return carrecordDao.get(id);
+	}
+		
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-autowire="byName">
+
+	<!-- 数据库连接信息 加载外部配置文件 db.properties -->
+	<context:property-placeholder location="classpath:db.properties" />
+	<!-- 配置数据源 开始 -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${db_driver}"></property>
+		<property name="url" value="${db_url}"></property>
+		<property name="username" value="${db_user}"></property>
+		<property name="password" value="${db_pass}"></property>
+	</bean>
+	<!-- 配置数据源 结束 -->
+	<!-- 配置SessionFatory  开始 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<!-- update改为create可以反向生产数据库文件 -->
+				<!-- <prop key="hibernate.hbm2ddl.auto">update</prop> -->
+				<prop key="hibernate.show_sql">false</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/bureau/pojo/QRole.hbm.xml</value>
+				<value>com/bureau/pojo/Dictionary.hbm.xml</value>
+				<value>com/bureau/pojo/QUser.hbm.xml</value>
+				<value>com/bureau/pojo/QMenu.hbm.xml</value>
+				<value>com/bureau/pojo/Log.hbm.xml</value>
+				<value>com/bureau/pojo/Notice.hbm.xml</value>
+				<value>com/bureau/pojo/Customer.hbm.xml</value>
+				<value>com/bureau/pojo/Lunch.hbm.xml</value>
+				<value>com/bureau/pojo/Paycar.hbm.xml</value>
+				<value>com/bureau/pojo/Publiccar.hbm.xml</value>
+				<value>com/bureau/pojo/Privatecar.hbm.xml</value>
+				<value>com/bureau/pojo/Newepcar.hbm.xml</value>
+				<value>com/bureau/pojo/Personfile.hbm.xml</value>
+				<value>com/bureau/pojo/Goodsin.hbm.xml</value>
+				<value>com/bureau/pojo/Goodsout.hbm.xml</value>
+				<value>com/bureau/pojo/Carrecord.hbm.xml</value>
+				<value>com/bureau/pojo/Pricarrecord.hbm.xml</value>
+				<value>com/bureau/pojo/Memo.hbm.xml</value>
+				<value>com/bureau/pojo/Oldepcar.hbm.xml</value>
+				<value>com/bureau/pojo/Checkepcar.hbm.xml</value>
+				<value>com/bureau/pojo/Document.hbm.xml</value>
+				<value>com/bureau/pojo/Gascar.hbm.xml</value>
+				<value>com/bureau/pojo/Softflag.hbm.xml</value>
+				<value>com/bureau/pojo/Global.hbm.xml</value></list>
+		</property>
+	</bean>
+	<!-- 配置SessionFatory  结束-->	
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/>
+		</property>
+	</bean>
+	<!-- 定义事务的传播特性 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+		    <!-- 定义事务的参数 -->
+			<tx:method name="add*" propagation="REQUIRED"/>
+			<tx:method name="del*" propagation="REQUIRED"/>
+			<tx:method name="upd*" propagation="REQUIRED"/>
+			<tx:method name="get*" propagation="NOT_SUPPORTED"/>
+			<tx:method name="find*" propagation="NOT_SUPPORTED"/>
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	<!-- 织入事务 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.bureau.biz.impl.*.*(..))" id="bizpc"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="bizpc"/>
+	</aop:config>
+	<!-- 配置dao开始 -->
+	<bean class="com.bureau.dao.impl.DictionaryDaoImpl" id="dicDao"/>
+	<bean class="com.bureau.dao.impl.MenuDaoImpl" id="menuDao"/>
+	<bean class="com.bureau.dao.impl.RoleDaoImpl" id="roleDao"/>
+	<bean class="com.bureau.dao.impl.UserDaoImpl" id="userDao"/>
+	<bean class="com.bureau.dao.impl.LogDaoImpl" id="logDao"/>
+	<bean class="com.bureau.dao.impl.NoticeDaoImpl" id="ncDao"/>
+	<bean class="com.bureau.dao.impl.PersionFileDaoImpl" id="persionfileDao"/>
+	<!-- 配置dao结束 -->
+	
+	<!-- 配置biz开始 -->
+	<bean class="com.bureau.biz.impl.UserBizImpl" id="userBiz"/>
+	<bean class="com.bureau.biz.impl.RoleBizImpl" id="roleBiz"/>
+	<bean class="com.bureau.biz.impl.TreeBizImpl" id="treeBiz"/>
+	<bean class="com.bureau.biz.impl.DictionaryBizImpl" id="dicBiz"/>
+	<bean class="com.bureau.biz.impl.LogBizImpl" id="logBiz"/>
+	<bean class="com.bureau.biz.impl.NoticeBizImpl" id="ncBiz"/>
+	<bean class="com.bureau.biz.impl.PersionFileBizImpl" id="persionfileBiz"/>
+	<!-- 配置biz结束 -->
+	
+	<!-- 配置Action开始-->
+	<bean class="com.bureau.action.UserAction" id="userAction" scope="prototype"/>
+	<bean class="com.bureau.action.RoleAction" id="roleAction" scope="prototype"/>
+	<bean class="com.bureau.action.TreeAction" id="treeAction" scope="prototype"/>
+	<bean class="com.bureau.action.ForwardAction" id="forwardAction" scope="prototype"/>
+	<bean class="com.bureau.action.DictionaryAction" id="dictionaryAction" scope="prototype"/>
+	<bean class="com.bureau.action.LogAction" id="logAction" scope="prototype"/>
+	<bean class="com.bureau.action.NoticeAction" id="ncAction" scope="prototype"/>
+	<bean class="com.bureau.action.PersionFileAction" id="persionfileAction" scope="prototype"/>
+	<!-- 配置Action结束-->
+	
+</beans>

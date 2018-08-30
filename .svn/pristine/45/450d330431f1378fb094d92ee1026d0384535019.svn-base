@@ -1,0 +1,191 @@
+package com.bureau.pojo;
+
+/**
+ * Customer entity. @author MyEclipse Persistence Tools
+ */
+
+public class Customer implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private String style;
+	private String name;
+	private String email;
+	private String wechat;
+	private String address;
+	private String legal;
+	private String phone;
+	private String cname;
+	private String cphone;
+	private String brief;
+	private String project;
+	private Double money;
+	private String eval;
+	private String createtime;
+
+	// Constructors
+
+	/** default constructor */
+	public Customer() {
+	}
+
+	/** full constructor */
+	public Customer(String style, String name, String email, String wechat,
+			String address, String legal, String phone, String cname,
+			String cphone, String brief, String project, Double money,
+			String eval, String createtime) {
+		this.style = style;
+		this.name = name;
+		this.email = email;
+		this.wechat = wechat;
+		this.address = address;
+		this.legal = legal;
+		this.phone = phone;
+		this.cname = cname;
+		this.cphone = cphone;
+		this.brief = brief;
+		this.project = project;
+		this.money = money;
+		this.eval = eval;
+		this.createtime = createtime;
+	}
+	//分页属性,不做映射
+	private Integer page;//表示当前是第几页
+	private Integer rows;//每页显示多少条记录
+	
+	public Integer getPage() {
+		return page;
+	}
+	public void setPage(Integer page) {
+		this.page = page;
+	}
+	public Integer getRows() {
+		return rows;
+	}
+	public void setRows(Integer rows) {
+		this.rows = rows;
+	}
+	//分页属性,不做映射
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getStyle() {
+		return this.style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return this.email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getWechat() {
+		return this.wechat;
+	}
+
+	public void setWechat(String wechat) {
+		this.wechat = wechat;
+	}
+
+	public String getAddress() {
+		return this.address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getLegal() {
+		return this.legal;
+	}
+
+	public void setLegal(String legal) {
+		this.legal = legal;
+	}
+
+	public String getPhone() {
+		return this.phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getCname() {
+		return this.cname;
+	}
+
+	public void setCname(String cname) {
+		this.cname = cname;
+	}
+
+	public String getCphone() {
+		return this.cphone;
+	}
+
+	public void setCphone(String cphone) {
+		this.cphone = cphone;
+	}
+
+	public String getBrief() {
+		return this.brief;
+	}
+
+	public void setBrief(String brief) {
+		this.brief = brief;
+	}
+
+	public String getProject() {
+		return this.project;
+	}
+
+	public void setProject(String project) {
+		this.project = project;
+	}
+
+	public Double getMoney() {
+		return this.money;
+	}
+
+	public void setMoney(Double money) {
+		this.money = money;
+	}
+
+	public String getEval() {
+		return this.eval;
+	}
+
+	public void setEval(String eval) {
+		this.eval = eval;
+	}
+
+	public String getCreatetime() {
+		return this.createtime;
+	}
+
+	public void setCreatetime(String createtime) {
+		this.createtime = createtime;
+	}
+
+}

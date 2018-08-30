@@ -1,0 +1,418 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<style type="text/css">
+body {
+		margin: 8px;
+		padding: 0;
+	}
+	
+	.td_left{
+		background: #88a6b147;
+		width:20%;
+		text-align: right;
+	}
+	.td_right{
+		width: 30%;
+	}
+	 table tr td{
+		    border-right: solid 1px #c0cdd8;
+  			border-bottom: solid 1px #c0cdd8;
+			padding:3px 0;
+			height: 50px;
+			font-size: 18px;
+	}
+	#td_left{
+		background: #D6E4F0;
+		width:20%;
+		text-align: right;
+	}
+	 input{
+		padding:2px 0;
+		margin-left:2px;
+		border: #5890a570 1px solid;
+		outline-color:#1553a263 ;
+		width: 80%;
+		height: 90%;
+		font-size: 20px;
+	}
+	.searchbox-button{
+		width: 40px;
+	}
+	.searchbox{
+		width: 400px;
+	}
+	
+</style>
+<html>
+
+<body>
+	<!-- 列表 -->
+	<table id="dg" ></table> 
+	<!-- 列表 -->
+	<!-- 添加开始 -->
+   	<div style="display: none;">
+		<div id="tj" class="easyui-dialog" title="客户信息增加"
+			style="width:600px;height:atuo;padding:25px 25px 50px 25px;top:15px;"
+			data-options="iconCls:'icon-save',resizable:true,modal:true,
+	        buttons:'#tb_user_add_dialog_bt'">
+			<form method="post" id="form" enctype="multipart/form-data"
+				style="margin-top: 15px; margin-left: 15px;">
+				<input type="hidden" name="id" id="id" value="0">
+					<div style="width: 100%;">
+						<table style="width: 96%;margin-left:2%;border: solid 1px #c0cdd8;border-right: none;border-bottom: none;" cellpadding="1" cellspacing="0">
+								<tr>
+									<td class="td_left">企业类型:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="style" name="style" type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">企业名称:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="name" name="name" type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">企业邮箱:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="email" name="email" type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">微信号:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="wechat" name="wechat" type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">详细地址:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="address" name="address" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">法人代表:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="legal" name="legal" type="text" style="overflow: hidden;width:87%;">
+										
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">办公室电话:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="phone" name="phone" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">常用联系人:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="cname" name="cname" type="text" style="width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">联系人手机:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="cphone" name="cphone" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">企业简介:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="brief" name="brief" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">合作项目:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="project" name="project" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">欠款费用:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="money" name="money" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+								<tr>
+									<td class="td_left">客户评价:
+										<font color="red">*</font>
+									</td>
+									<td class="td_right">
+										<input id="eval" name="eval" type="text" style="overflow: hidden;width:87%;" >
+									</td>
+								</tr>
+							</table>
+					</div>
+			</form>
+		</div>
+		<div id="tb_user_add_dialog_bt">
+			<a id="tb_user_add_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-save',">保存</a>
+			<a id="tb_user_add_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+		</div>
+	</div> 
+	<!-- 添加结束 -->
+	<!-- 模糊查询开始 -->
+	<div id="tb">
+		<div style="margin-left: 25px; height: 40px; float: left;">
+			<div style="margin-top: 15px;">
+				<a href="javascript:add()" id="tb_user_add" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+				<div class="datagrid-btn-separator"></div> 
+			</div>
+		</div>
+		<div style="margin-left: 25px; height: 40px;float: left;">
+			<script type="text/javascript">
+				function search(value, name) {
+					$('#dg').datagrid('reload', {
+						"name" : value
+					});
+				}
+			</script>
+			<div style="margin-top: 15px;">
+				<input id="uuu" class="easyui-searchbox" style="width:400px;"
+					data-options="searcher:search,prompt:'此处输入车牌号，支持模糊查询',menu:'#mm'"></input>
+				<div id="mm" style="width:120px">
+					<div data-options="name:'all',iconCls:'icon-ok'">车牌号码</div>
+				</div>
+
+			</div>
+		</div>
+	</div> 
+	<!-- 模糊查询结束 -->
+</body>
+<script type="text/javascript">
+	$(function() {
+			/* 页面自适应 */
+			$(window).resize(function () {
+	            $('#dg').datagrid('resize', {
+	                width: $(window).width() - 50,
+	            }).datagrid('resize', {
+	                width: $(window).width() - 50,
+	            });
+	        });
+	        
+	        /* 隐藏添加窗口 */
+			$('#tj').dialog('close');
+			
+  			/* 验证session开始 */
+			var curPath = window.document.location.href;
+		 	var pathName = window.document.location.pathname;
+		 	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+		 	var s="<%=session.getAttribute("login_users")%>"; 
+		 	if(s=="null"){ 
+		 		top.location.href = location.href=basePath+"JRmanage";
+		 	}
+			/* 验证session结束 */
+			
+			/* 列表展示 */
+			$("#dg").datagrid({
+					'url' : 'customer_list.action',//请求的地址
+					  fitColumns:true,//宽度自适应
+					'loadMsg' : '正在加载...',//加载时的提示
+					'rownumbers' : true,//显示行数
+					'pagination':true,
+					'singleSelect' : true,//只允许选择一行
+					//pageSize:20,
+					 toolbar: '#tb',
+					columns : [[{field : 'id',title : '序号',align:'center'},
+							{field : 'style',title : '企业类型',align:'center',width:10},
+							{field : 'name',title : '企业名称',align:'center',width:10},
+							{field : 'email',title : '企业邮箱',align:'center',width:10},
+							{field : 'wechat',title : '微信',align:'center',width:10},
+							{field : 'address',title : '详细地址',align:'center',width:10},
+							{field : 'legal',title : '法人代表',align:'center',width:10},
+							{field : 'phone',title : '办公室电话',align:'center',width:10},
+							{field : 'cname',title : '常用联系人',align:'center',width:10},
+							{field : 'cphone',title : '联系人手机',align:'center',width:10},
+							{field : 'brief',title : '企业简介',align:'center',width:10},
+							{field : 'project',title : '合作项目',align:'center',width:10},
+							{field : 'money',title : '欠款费用',align:'center',width:10},
+							{field : 'eval',title : '客户评价',align:'center',width:10},
+							{field : 'null',title : '操作',align:'center',width:10,
+								formatter : function(value, row, index) {
+									   return "<a style='margin-right: 5px;' href='javascript:edit(" + row.id+ ");'>修改</a>"
+									   		 +"<a style='margin-right: 5px;margin-left: 15px;' href='javascript:del(" + row.id+ ");'>删除</a>";
+								}
+							}
+					]]
+			});
+  	});
+
+  	//车辆增加
+  	function add(){
+		//打开添加窗口
+		$('#tj').dialog('open');
+		//取消
+		$('#tb_user_add_dialog_btc').on('click',function(){
+			$('#tj').dialog('close');
+			window.location.reload();//重新载入当前页面
+		});
+		//你想在关闭时执行的代码
+		$('#tj').dialog({onClose:function(){
+			window.location.reload();//重新载入当前页面
+		}});
+  		/* form表单提交 */	
+		var a = false;
+		var b = false;
+		$('#tb_user_add_dialog_bts').on('click',function(){
+		
+			var inp = $("#form").find("table").find("tr").find("td").find("input[type='text']").each(function(){
+					var values = $(this).val();
+					 if (!values || values.trim()==""){
+						$(this).css("border","1px solid red");
+						$(this).attr("placeholder","提示:本项不能为空");
+						a= false;
+						return false;
+					}else{
+						$(this).css("border","1px solid #C0CDD8");
+						$(this).removeAttr("placeholder");
+						a =true;
+					}
+			});
+			if(a){
+				$("#form").form("submit", {
+				    url:'customer_add.action',     
+				    success:function(data){  
+				    //将 data转换成json  原因：从后台传递过来的数据，都是字符串  
+				        var obj=$.parseJSON(data);
+				        if(obj.success){
+				       		$('#form').form('clear');//清除表单数据。
+							window.location.reload();//重新载入当前页面
+				        }
+				        $.messager.show({
+							title:'提示',
+							msg:obj.message,
+							timeout:1000,
+							style:{  
+								right:'',  
+								bottom:''  
+							}
+						});
+				    }    
+				});
+			}
+		});
+	}
+	//删除
+	function del(id){
+		$.messager.confirm('确认','您确认想要删除记录吗？',function(r){    
+		    if (r){    
+		        $.ajax({
+					url : 'customer_del.action',
+					data:{id:id},
+					dataType : 'json',
+					type : 'POST',
+					success : function(data) {
+						window.location.reload();//重新载入当前页面
+					}
+				});    
+		    }    
+		}); 
+	}
+	//编辑
+	function edit(id){
+		//var cnum = document.getElementById("carnumber").readOnly=true;
+		
+		var a = false;
+		var b = false;
+		//改变对话框的标题
+		$('#tj').dialog({ title: '车辆信息修改'});
+		//根据id获取信息
+		$.ajax({
+			    url : 'customer_findById.action',
+			    type : "post",
+			    data:{id:id},
+			    dataType : "json",  
+			    success : function(data)  {
+				    //回填数据
+				    //给隐藏域赋值
+				    $('#tj #id').val(data.id);
+					$('#tj #style').val(data.style);
+					$('#tj #name').val(data.name);
+					$('#tj #email').val(data.email);
+					$('#tj #wechat').val(data.wechat);
+					$('#tj #address').val(data.address);
+					$('#tj #legal').val(data.legal);
+					$('#tj #phone').val(data.phone);
+					$('#tj #cname').val(data.cname);
+					$('#tj #cphone').val(data.cphone);
+					$('#tj #brief').val(data.brief);
+					$('#tj #project').val(data.project);
+					$('#tj #money').val(data.money);
+					$('#tj #eval').val(data.eval);
+					//打开对话框
+					$("#tj").dialog('open');
+					$('#tb_user_add_dialog_bts').on('click',function(){
+						var inp = $("#form").find("table").find("tr").find("td").find("input[type='text']").each(function(){
+								var values = $(this).val();
+								 if (!values || values.trim()==""){
+									$(this).css("border","1px solid red");
+									$(this).attr("placeholder","提示:本项若无请填写  0");
+									a= false;
+									return false;
+								}else{
+									$(this).css("border","1px solid #C0CDD8");
+									$(this).removeAttr("placeholder");
+									a =true;
+								}
+						});
+							if(a){
+								$('#form').form('submit', {
+								    url:'customer_updata.action',     
+								    success:function(data){  
+								    //将 data转换成json  原因：从后台传递过来的数据，都是字符串  
+								        var obj=$.parseJSON(data);
+								        if(obj.success){
+								       		$('#form').form('clear');//清除表单数据。
+											window.location.reload();//重新载入当前页面
+								        }
+								        $.messager.show({
+											title:'提示',
+											msg:obj.message,
+											timeout:1000,
+											style:{  
+												right:'',  
+												bottom:''  
+											}
+										});
+								    }    
+								});
+							}
+			 	    });
+					//取消
+					$('#tb_user_add_dialog_btc').on('click',function(){
+						$('#tj').dialog('close');
+						window.location.reload();//重新载入当前页面
+					});
+					$('#tj').dialog({onClose:function(){
+				  			 //你想在关闭时执行的代码
+						window.location.reload();//重新载入当前页面
+					}});
+			 },
+		});
+	}
+</script>
+</html>

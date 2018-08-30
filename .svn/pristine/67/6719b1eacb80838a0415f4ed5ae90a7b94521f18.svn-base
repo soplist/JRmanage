@@ -1,0 +1,99 @@
+package com.bureau.action;
+
+import java.util.List;
+
+import com.bureau.biz.LunchBiz;
+import com.bureau.pojo.Lunch;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class LunchAction extends BaseAction implements ModelDriven<Lunch>{
+	//注入LunchBiz
+	private LunchBiz lchBiz;
+	public void setLchBiz(LunchBiz lchBiz) {
+		this.lchBiz = lchBiz;
+	}
+
+	//传递的实体
+	private Lunch lch;
+	public void setLch(Lunch lch) {
+		this.lch = lch;
+	}
+	public Lunch getLch() {
+		return lch;
+	}
+	
+	//接收前台参数
+	private String idStart;
+	public void setIdStart(String idStart) {
+		this.idStart = idStart;
+	}
+	public String getIdStart() {
+		return idStart;
+	}
+	private String idEnd;
+	public void setIdEnd(String idEnd) {
+		this.idEnd = idEnd;
+	}
+	public String getIdEnd() {
+		return idEnd;
+	}
+	
+	//查询所有PageData<Lunch>
+	public void findAll(){
+		System.out.println("#######");
+		PageData<Lunch> pd = lchBiz.findAll(lch, idStart, idEnd);
+		this.writeJSON(pd);
+	}
+	
+	//查询所有List<Lunch>
+	public void findBytime(){
+		List<Lunch> list = lchBiz.findBytime(idStart, idEnd);
+		this.writeJSON(list);
+	}
+	
+	public void add(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		String nowTime = Quarter.getNowTime();//添加当前时间
+		lch.setCreatetime(nowTime);
+		boolean res = lchBiz.addLunch(lch);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void upd(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.UPDFAIL);
+		boolean res = lchBiz.updLunch(lch);
+		if(res){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void del(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.DELFAIL);
+		boolean res = lchBiz.delLunch(lch);
+		if(res){
+			tj.setMessage(SysConst.DELSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	
+	//ModelDriven
+	public Lunch getModel(){
+		if(lch == null)
+			lch = new Lunch();
+		return lch;
+	}
+}

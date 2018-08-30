@@ -1,0 +1,104 @@
+package com.bureau.action;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import com.bureau.biz.ChangeequipmentBiz;
+import com.bureau.biz.DictionaryBiz;
+import com.bureau.pojo.Changeequipment;
+import com.bureau.pojo.ChangeequipmentVo;
+import com.bureau.pojo.Dictionary;
+import com.bureau.pojo.Notice;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-17 上午9:21:40 
+ * 类说明 
+ */
+public class ChangeequipmentAction extends BaseAction implements ModelDriven<Changeequipment>  {
+	
+	private ChangeequipmentBiz ceBiz;
+	private Changeequipment ce;
+	private DictionaryBiz dicBiz;
+
+	public void setDicBiz(DictionaryBiz dicBiz) {
+		this.dicBiz = dicBiz;
+	}
+	public Changeequipment getCe() {
+		return ce;
+	}
+    public void setCe(Changeequipment ce) {
+		this.ce = ce;
+	}
+
+	public void setCeBiz(ChangeequipmentBiz ceBiz) {
+		this.ceBiz = ceBiz;
+	}
+
+	public Changeequipment getModel() {
+		if (ce == null) {
+			ce = new Changeequipment();
+		}
+		return ce;
+	}
+	//分页查询文件列表
+	public void findAll(){
+		PageData<ChangeequipmentVo> pd = new PageData<ChangeequipmentVo>();
+		pd = ceBiz.findAll(ce);
+		this.writeJSON(pd,new String[]{"persionfile","style","parent","qUsers"});
+	}
+	
+	public void findCartypeList(){
+		List<Dictionary> cartypes=dicBiz.findDictionaryByName("车辆类型");
+		this.writeJSON(cartypes);
+	}
+	
+	public void add() throws UnsupportedEncodingException{
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		boolean res = false;	
+		ce.setCreatetime(Quarter.getNowTime());
+		res = ceBiz.add(ce);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	
+	public void del(){
+		try{
+		    TempJson tj=new TempJson();
+		    tj.setMessage(SysConst.DELFAIL);
+		    
+		    ce = ceBiz.findById(ce.getId());
+		    
+		    boolean res = ceBiz.del(ce);
+		
+		    if(res){
+			    tj.setMessage(SysConst.DELSUCCESS);
+			    tj.setSuccess(true);
+		    }
+		    this.writeJSON(tj);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
+	
+	public void update(){
+		TempJson tj=new TempJson();
+		boolean result = ceBiz.update(ce);
+		if(result){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}else{
+			tj.setMessage(SysConst.UPDFAIL);
+		}
+		this.writeJSON(tj);
+	}
+}

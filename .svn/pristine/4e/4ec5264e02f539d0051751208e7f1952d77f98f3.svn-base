@@ -1,0 +1,100 @@
+package com.bureau.action;
+
+
+import java.util.List;
+
+import com.bureau.biz.GlobalBiz;
+import com.bureau.biz.PrivatecarBiz;
+import com.bureau.pojo.Global;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Personfile;
+import com.bureau.pojo.Privatecar;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class PrivatecarAction extends BaseAction implements ModelDriven<Privatecar>{
+	private Privatecar pr;
+	public Privatecar getPr() {
+		return pr;
+	}
+	public void setPr(Privatecar pr) {
+		this.pr = pr;
+	}
+	
+	public Privatecar getModel() {
+		if(pr==null){
+			pr=new Privatecar();
+		}
+		return pr;
+	}
+	
+	//注入BIZ
+	private PrivatecarBiz prBiz;
+	public void setPrBiz(PrivatecarBiz prBiz) {
+		this.prBiz = prBiz;
+	}
+	
+	//
+	private GlobalBiz globalBiz;
+	
+	public void setGlobalBiz(GlobalBiz globalBiz) {
+		this.globalBiz = globalBiz;
+	}
+	
+	//
+	public void findAllGlobal(){
+		List<Global> pd = globalBiz.findAllGlobal();
+		this.writeJSON(pd);
+	}
+	//列表展示
+	public void list(){
+		PageData<Privatecar> tos = prBiz.findAll(pr);	
+		this.writeJSON(tos,new String[]{"privatecar"});
+	}
+	//增加
+	public void add(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		String nowTime = Quarter.getNowTime();
+		System.out.println(pr.getBuytime());
+		pr.setCreatetime(nowTime);
+  		boolean res = prBiz.add(pr);
+		if(res){
+			tj.setMessage(SysConst.ADDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//修改
+	public void updata(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.UPDFAIL);
+		String nowTime = Quarter.getNowTime();
+		System.out.println(nowTime);
+		pr.setCreatetime(nowTime);
+		boolean res=prBiz.upd(pr);
+		if(res){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//删除
+	public void del(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.DELFAIL);
+		boolean res = prBiz.del(pr);
+		if(res){
+			tj.setMessage(SysConst.DELSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//根据id查询
+	public void findById(){
+		pr=prBiz.findById(pr.getId());
+		this.writeJSON(pr);
+	}
+}

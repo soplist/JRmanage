@@ -1,0 +1,72 @@
+package com.bureau.biz.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.PersionFileBiz;
+import com.bureau.dao.PersionFileDao;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Personfile;
+import com.bureau.pojo.QUser;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-6 上午8:32:22 
+ * 类说明 
+ */
+public class PersionFileBizImpl implements PersionFileBiz {
+	
+	private PersionFileDao persionfileDao;
+	
+	public void setPersionfileDao(PersionFileDao persionfileDao) {
+		this.persionfileDao = persionfileDao;
+	}
+
+	public boolean add(Personfile p) {
+		return persionfileDao.add(p);
+	}
+	
+	public PageData<Personfile> findAllPersonfile(Personfile pf) {
+		String hql="from Personfile p";
+		String counthql="select count(p.id) from Personfile p";
+		Map<String, Object> params=new HashMap<String, Object>();
+		if(pf.getName()!=null){
+			hql+=" where p.name like :name";
+			counthql+=" where p.name like :name";
+			params.put("name", "%"+pf.getName()+"%");
+		}
+		hql+=" order by id desc";
+		List<Personfile> personfiles = persionfileDao.list(hql, params, (pf.getPage()-1)*pf.getRows(),pf.getRows());
+		PageData<Personfile> pd=new PageData<Personfile>();
+		Integer total = persionfileDao.count(counthql, params);
+		//放入pageDate
+		pd.setRows(personfiles);
+		pd.setTotal(total);
+		return pd;
+	}
+	
+	public boolean update(Personfile pf){
+		String hql="update Personfile p set p.name=:name,p.sex=:sex,p.depart=:depart,p.job=:job,p.email=:email,p.startdate=:startdate,p.education=:education,p.workdate=:workdate,p.enddate=:enddate,p.phone=:phone,p.driver=:driver,p.inservice=:inservice,p.remark=:remark where p.id=:id";
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("name",pf.getName());
+		params.put("sex",pf.getSex());
+		params.put("depart",pf.getDepart());
+		params.put("job",pf.getJob());
+		params.put("email",pf.getEmail());
+		params.put("startdate",pf.getStartdate());
+		params.put("education",pf.getEducation());
+		params.put("workdate",pf.getWorkdate());
+		params.put("enddate",pf.getEnddate());
+		params.put("phone",pf.getPhone());
+		params.put("driver",pf.getDriver());
+		params.put("inservice",pf.getInservice());
+		params.put("remark",pf.getRemark());
+		params.put("id",pf.getId());
+		if(persionfileDao.execute(hql, params)>-1){
+		    return true;
+		}else{
+		    return false;
+		}
+	}
+}

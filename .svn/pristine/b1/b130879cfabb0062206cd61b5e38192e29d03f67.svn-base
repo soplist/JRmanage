@@ -1,0 +1,93 @@
+package com.bureau.action;
+
+import com.bureau.biz.GlobalBiz;
+import com.bureau.pojo.Global;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.TempJson;
+import com.bureau.unit.Quarter;
+import com.bureau.unit.SysConst;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class GlobalAction extends BaseAction implements ModelDriven<Global>{
+	//注入Biz
+	private GlobalBiz globalBiz;
+	public void setGlobalBiz(GlobalBiz globalBiz) {
+		this.globalBiz = globalBiz;
+	}
+
+	//实体类
+	private Global glb;
+	public Global getGlb() {
+		return glb;
+	}
+	public void setGlb(Global glb) {
+		this.glb = glb;
+	}
+	
+	//查询所有
+	public void findAllGlobal(){
+		PageData<Global> pd = globalBiz.findGlobalByAll(glb);
+		this.writeJSON(pd);
+	}
+
+	//add添加方法
+	public void add(){
+		System.out.println(glb.getOutput()+" ###### "+glb.getHkm());
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		try{
+			boolean res = globalBiz.addGlobal(glb);
+			if(res){
+				tj.setMessage(SysConst.ADDSUCCESS);
+				tj.setSuccess(true);
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		this.writeJSON(tj);
+	} 
+	
+	//upd修改方法
+	public void upd(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.UPDFAIL);
+		boolean res = globalBiz.updGlobal(glb);
+		if(res){
+			tj.setMessage(SysConst.UPDSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	}
+	//del删除方法
+	public void del(){
+		TempJson tj=new TempJson();
+		tj.setMessage(SysConst.ADDFAIL);
+		boolean res = globalBiz.delGlobal(glb);
+		if(res){
+			tj.setMessage(SysConst.DELSUCCESS);
+			tj.setSuccess(true);
+		}
+		this.writeJSON(tj);
+	} 
+	
+	//查看数据库是否已存在
+	public void isbe(){
+		if(glb.getOutput()!=null){
+			Global g = null;
+			g = globalBiz.findByOutput(glb.getOutput());
+			boolean result = false;
+			if(g!=null){
+				result = true ;
+			}
+			this.writeJSON(result);
+		}
+	}
+	
+	
+	public Global getModel() {
+		if(glb==null){
+			glb=new Global();
+		}
+		return glb;
+	}
+}

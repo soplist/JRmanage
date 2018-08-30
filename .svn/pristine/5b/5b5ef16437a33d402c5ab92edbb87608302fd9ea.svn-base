@@ -1,0 +1,231 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../Inc.jsp"></jsp:include>
+<script type="text/javascript">
+$(function(){
+	/* 页面自适应 */
+	$(window).resize(function () {
+	      $('#dg').datagrid('resize', {width: $(window).width() - 50,}).datagrid('resize', {
+	      width: $(window).width() - 50,});
+	 });
+	/* 验证session开始 */
+	var curPath = window.document.location.href;
+	var pathName = window.document.location.pathname;
+	var	basePath = curPath.substring(0,curPath.indexOf(pathName)) + "/";
+	var s="<%=session.getAttribute("login_users")%>"; 
+	if(s=="null"){ 
+	 	top.location.href = location.href=basePath+"JRmanage";
+	}
+	
+	 //加载表格数据
+	 $('#dg_memo').datagrid({    
+	    url:'mm_findAll.action', 
+	    pagination:'true',
+	    singleSelect:'true',//只允许选取一行
+	    fitColumns:true,//宽度自适应
+	    rownumbers:true,   
+	    toolbar: '#tb_user',
+	    columns:[[
+	        {checkbox:true},     
+	        {field:'title',title:'备忘录标题',align:'center',width:12},
+	        {field:'content',title:'内容',align:'center',width:15},
+	        {field:'peopleid',title:'添加人',align:'center',width:15,
+	        	formatter: function(value,row,index){	
+					return value.name;
+				}
+	        },
+	        {field:'createtime',title:'记录时间',align:'center',width:15},
+	        {field:'null',title:'操作',align:'center',width:20,
+	        	formatter: function(value,row,index){
+		        	var str='';
+					str='<a id="adel" href="javascript:momoDel('+row.id+');">删除记录</a>';
+					return str;	
+				}
+			}     
+		]]    
+	 });
+	 
+	  //添加
+	$('#tb_user_add').on('click',function(){
+	    initCombox01($('#peopleid'),'persionfile_findAllPersonfiles.action',null,-1);//初始化领用人
+		$('#tb_user_add_dialog').dialog('open'); //点击新增按钮弹出新增页面
+	});
+	//保存
+	$('#tb_user_add_dialog_bts').on('click',function(){
+		$('#user_addForm').form('submit', {    
+			    url:'mm_add.action',     
+			    success:function(data){  
+			    //将 data转换成json  原因：从后台传递过来的数据，都是字符串  
+			        var obj=$.parseJSON(data);
+			        if(obj.success){
+						window.location.reload();//重新载入当前页面
+			        }
+			        $.messager.show({title:'提示',msg:obj.message});
+			    }    
+		});
+	});
+	//取消
+	$('#tb_user_add_dialog_btc').on('click',function(){
+		$('#tb_user_add_dialog').dialog('close');
+	});	
+	
+	//修改
+	$('#tb_user_ed').on('click',function(){
+		var rows=$('#dg_memo').datagrid('getChecked'); //在复选框呗选中的时候返回所有行  
+		if(rows.length==0){
+				 $.messager.show({title:'提示',msg:'请勾选要修改的配置项'});
+		}else if(rows.length!=1){
+				$.messager.show({title:'提示',msg:'修改时只能选择一个配置项'});
+		}else{
+				$('#tb_user_upd_dialog').dialog('open');
+				$('#user_updForm #title').val(rows[0].title);
+				$('#user_updForm #content').val(rows[0].content);
+				$('#user_updForm #peopleid').val(rows[0].peopleid.name);	
+				$('#user_updForm #createtime').val(rows[0].createtime);	
+		} 
+	});
+	//保存
+	$('#tb_user_upd_dialog_bts').on('click',function(){
+			$('#user_updForm').form('submit', {    
+			    url:'mm_upd.action',     
+			    success:function(data){
+			        var obj=$.parseJSON(data);
+			        if(obj.success){
+			        	$('#user_updForm').form('clear');
+						$('#dg_memo').datagrid('reload');
+						$('#tb_user_upd_dialog').dialog('close');	
+			        }
+			        $.messager.show({title:'提示',msg:obj.message});
+			    }    
+			}); 
+	});	
+	$('#tb_user_upd_dialog_btc').on('click',function(){
+		$('#tb_user_upd_dialog').dialog('close');
+	});
+	
+	//搜索框模糊查询
+	$('#btn').bind('click', function(){
+		var starttime = document.getElementById("starttime").value;
+		var endtime = document.getElementById("endtime").value;
+		//把字符串格式转换为日期类
+		var startdate = new Date(Date.parse(starttime));
+		var enddate = new Date(Date.parse(endtime));
+		if(starttime == "" || endtime == ""){
+			$.messager.alert('提示','请输入查询日期'); 
+		}else if(startdate >= enddate){
+			$.messager.alert('提示','起始日期不能大于结束日期'); 
+		}else{
+		    var idStart="",idEnd="";
+			$.ajax({
+				url: 'mm_findBytime.action',
+				data:{idStart:starttime,idEnd:endtime},
+				type:"post",
+			    dataType:"json",   
+				success: function(data) {
+					if(data.length == 0){
+						$.messager.alert('提示','根据查询条件，数据库无任何记录');
+					}else{
+						$('#dg_memo').datagrid('reload',{idStart:starttime,idEnd:endtime});//重新加载
+					}
+				}
+			});  	 
+		}
+	});
+});
+
+//删除
+function momoDel(id){
+	$.messager.confirm('确认','是否删除此条信息!',function(r){    
+		if(r){    
+			$.post('mm_del.action',{"id":id},function(data){
+				var obj=$.parseJSON(data);
+				$.messager.show({title:'提示',msg:obj.message});
+				$('#dg_memo').datagrid('reload');//重新加载
+			});    
+ 		}    
+	}); 
+}
+</script>
+
+<body>
+<!-- 用户数据表格 -->
+<table id="dg_memo"></table>
+<!-- 定义菜单 -->
+<div id="tb_user">
+	<a id="tb_user_add" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+	<div class="datagrid-btn-separator"></div>
+	<a id="tb_user_ed" style="float:left;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">编辑</a>
+	<div class="datagrid-btn-separator"></div>  
+	<!-- 创建搜索框 -->
+	起始时间：<input id="starttime"  type="text"  style="width:150px;"  placeholder="此处选择起始时间" class="Wdate" onfocus="WdatePicker({lang:'zh-cn',skin:'whyGreen',dateFmt:'yyyy-MM-dd'})"/>&nbsp;------
+	结束时间：<input id="endtime"  type="text"  style="width:150px;"  placeholder="此处选择结束时间" class="Wdate" onfocus="WdatePicker({lang:'zh-cn',skin:'whyGreen',dateFmt:'yyyy-MM-dd'})"/>
+	<button id="btn" class="easyui-linkbutton" style="width:50px;">搜索</button>
+</div>
+</body>
+
+<!-- 定义添加窗口-->
+<div id="tb_user_add_dialog" class="easyui-dialog" title="新增备忘录信息" style="width:450px;height:300px;align:center;top:1px;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_user_add_dialog_bt'">   
+       <form id="user_addForm" method="post">
+       		<br><br><br>
+       		<table>
+	    		<tr>
+	    			<td width="25px"></td>
+	    			<td align="right">备忘录标题：</td>
+	    			<td><input type="text" style="width:200px;" id="title" name="title"/></td>
+	    		</tr>    		
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">内容：</td>
+	    			<td><input type="text" style="width:200px;"  id="content" name="content"/></td>
+	    		</tr>	
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">添加人：</td>
+	    			<td><input id="peopleid" name="peopleid.id" class="easyui-combobox" style="width:200px;" data-options="editable:true"/></td>
+	    		</tr>		    		
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">记录时间：</td>
+	    			<td><input type="text" style="width:200px;" class="easyui-datetimebox" id="createtime" name="createtime" value="08/08/2014" disabled="disabled"/></td>
+	    		</tr>	    		
+			</table>	
+       </form>
+</div>
+<div id="tb_user_add_dialog_bt">
+	<a id="tb_user_add_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">保存</a>
+	<a id="tb_user_add_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>
+
+<!-- 修改信息窗口 -->
+<div id="tb_user_upd_dialog" class="easyui-dialog" title="修改备忘录信息" style="width:450px;height:300px;align:center;top:1px;"   
+        data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true,buttons:'#tb_user_upd_dialog_bt',">   
+       <form id="user_updForm" method="post">
+       		<br><br><br>
+       		<table>
+	    		<tr>
+	    			<td width="25px"></td>
+	    			<td align="right">备忘录标题：</td>
+	    			<td><input type="text" style="width:200px;" id="title" name="title"/></td>
+	    		</tr>    		
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">内容：</td>
+	    			<td><input type="text" style="width:200px;"  id="content" name="content"/></td>
+	    		</tr>	
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">添加人：</td>
+	    			<td><input type="text" id="peopleid" name="peopleid"  style="width:200px;" disabled="disabled"/></td>
+	    		</tr>		    		
+	    		<tr>
+	    			<td></td>
+	    			<td align="right">记录时间：</td>
+	    			<td><input type="text" style="width:200px;" class="easyui-datetimebox" id="createtime" name="createtime" value="08/08/2014" disabled="disabled"/></td>
+	    		</tr>	    		
+			</table>
+       </form>
+</div>
+<div id="tb_user_upd_dialog_bt">
+	<a id="tb_user_upd_dialog_bts" class="easyui-linkbutton" data-options="iconCls:'icon-ok',">保存</a>
+	<a id="tb_user_upd_dialog_btc" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',">取消</a>
+</div>

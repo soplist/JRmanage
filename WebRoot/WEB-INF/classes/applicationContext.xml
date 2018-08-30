@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-autowire="byName">
+
+	<!-- 数据库连接信息 加载外部配置文件 db.properties -->
+	<context:property-placeholder location="classpath:db.properties" />
+	<!-- 配置数据源 开始 -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${db_driver}"></property>
+		<property name="url" value="${db_url}"></property>
+		<property name="username" value="${db_user}"></property>
+		<property name="password" value="${db_pass}"></property>
+	</bean>
+	<!-- 配置数据源 结束 -->
+	<!-- 配置SessionFatory  开始 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<!-- update改为create可以反向生产数据库文件 -->
+				<!-- <prop key="hibernate.hbm2ddl.auto">update</prop> -->
+				<prop key="hibernate.show_sql">false</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/bureau/pojo/QRole.hbm.xml</value>
+				<value>com/bureau/pojo/Dictionary.hbm.xml</value>
+				<value>com/bureau/pojo/QUser.hbm.xml</value>
+				<value>com/bureau/pojo/QMenu.hbm.xml</value>
+				<value>com/bureau/pojo/Log.hbm.xml</value>
+				<value>com/bureau/pojo/Notice.hbm.xml</value>
+				<value>com/bureau/pojo/Customer.hbm.xml</value>
+				<value>com/bureau/pojo/Lunch.hbm.xml</value>
+				<value>com/bureau/pojo/Paycar.hbm.xml</value>
+				<value>com/bureau/pojo/Publiccar.hbm.xml</value>
+				<value>com/bureau/pojo/Privatecar.hbm.xml</value>
+				<value>com/bureau/pojo/Newepcar.hbm.xml</value>
+				<value>com/bureau/pojo/Personfile.hbm.xml</value>
+				<value>com/bureau/pojo/Goodsin.hbm.xml</value>
+				<value>com/bureau/pojo/Goodsout.hbm.xml</value>
+				<value>com/bureau/pojo/Carrecord.hbm.xml</value>
+				<value>com/bureau/pojo/Pricarrecord.hbm.xml</value>
+				<value>com/bureau/pojo/Memo.hbm.xml</value>
+				<value>com/bureau/pojo/Oldepcar.hbm.xml</value>
+				<value>com/bureau/pojo/Checkepcar.hbm.xml</value>
+				<value>com/bureau/pojo/Document.hbm.xml</value>
+				<value>com/bureau/pojo/Gascar.hbm.xml</value>
+				<value>com/bureau/pojo/Softflag.hbm.xml</value>
+				<value>com/bureau/pojo/Global.hbm.xml</value>
+				<value>com/bureau/pojo/Changeequipment.hbm.xml</value>
+				<value>com/bureau/pojo/Repair.hbm.xml</value></list>
+				
+		</property>
+	</bean>
+	<!-- 配置SessionFatory  结束-->	
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/>
+		</property>
+	</bean>
+	<!-- 定义事务的传播特性 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+		    <!-- 定义事务的参数 -->
+			<tx:method name="add*" propagation="REQUIRED"/>
+			<tx:method name="del*" propagation="REQUIRED"/>
+			<tx:method name="upd*" propagation="REQUIRED"/>
+			<tx:method name="get*" propagation="NOT_SUPPORTED"/>
+			<tx:method name="find*" propagation="NOT_SUPPORTED"/>
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	<!-- 织入事务 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.bureau.biz.impl.*.*(..))" id="bizpc"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="bizpc"/>
+	</aop:config>
+	<!-- 配置dao开始 -->
+	<bean class="com.bureau.dao.impl.DictionaryDaoImpl" id="dicDao"/>
+	<bean class="com.bureau.dao.impl.MenuDaoImpl" id="menuDao"/>
+	<bean class="com.bureau.dao.impl.RoleDaoImpl" id="roleDao"/>
+	<bean class="com.bureau.dao.impl.UserDaoImpl" id="userDao"/>
+	<bean class="com.bureau.dao.impl.LogDaoImpl" id="logDao"/>
+	<bean class="com.bureau.dao.impl.NoticeDaoImpl" id="ncDao"/>
+	<!-- ********************* -->
+	<bean class="com.bureau.dao.impl.PrivatecarDaoImpl" id="prDao"/>
+	<bean class="com.bureau.dao.impl.GlobalDaoImpl" id="globalDao"/>
+	<bean class="com.bureau.dao.impl.PubliccarDaoImpl" id="publiccarDao"/>
+	<bean class="com.bureau.dao.impl.CustomerDaoImpl" id="customerDao"/>
+	<bean class="com.bureau.dao.impl.PersionFileDaoImpl" id="persionfileDao"/>
+	<bean class="com.bureau.dao.impl.CarrecordDaoImpl" id="carrecordDao"/>
+	<bean class="com.bureau.dao.impl.GoodsinDaoImpl" id="gdDao"/>
+	<bean class="com.bureau.dao.impl.GoodsoutDaoImpl" id="gdoDao"/>
+    <bean class="com.bureau.dao.impl.LunchDaoImpl" id="lchDao"/>
+    <bean class="com.bureau.dao.impl.DocumentDaoImpl" id="dDao"/>
+    <bean class="com.bureau.dao.impl.GascarDaoImpl" id="gascarDao"/>
+    <bean class="com.bureau.dao.impl.PaycarDaoImpl" id="paycarDao"/>
+    <bean class="com.bureau.dao.impl.SoftflagDaoImpl" id="sfDao"/>
+    <bean class="com.bureau.dao.impl.CheckepcarDaoImpl" id="ccDao"/>
+    <bean class="com.bureau.dao.impl.PricarrecordDaoImpl" id="pricarrecordDao"/>
+    <bean class="com.bureau.dao.impl.NewepcarDaoImpl" id="newepcarDao"/>
+    <bean class="com.bureau.dao.impl.ChangeequipmentDaoImpl" id="ceDao"/>
+    <bean class="com.bureau.dao.impl.OldepcarDaoImpl" id="oDao"/>
+    <bean class="com.bureau.dao.impl.MemoDaoImpl" id="memoDao"/>
+    <bean class="com.bureau.dao.impl.RepairDaoImpl" id="repairDao"/>
+	<!-- 配置dao结束 -->
+	
+	<!-- 配置biz开始 -->
+	<bean class="com.bureau.biz.impl.UserBizImpl" id="userBiz"/>
+	<bean class="com.bureau.biz.impl.RoleBizImpl" id="roleBiz"/>
+	<bean class="com.bureau.biz.impl.TreeBizImpl" id="treeBiz"/>
+	<bean class="com.bureau.biz.impl.DictionaryBizImpl" id="dicBiz"/>
+	<bean class="com.bureau.biz.impl.LogBizImpl" id="logBiz"/>
+	<bean class="com.bureau.biz.impl.NoticeBizImpl" id="ncBiz"/>
+	<!-- ********************* -->
+	<bean class="com.bureau.biz.impl.PrivatecarBizImpl" id="prBiz"/>
+	<bean class="com.bureau.biz.impl.GlobalBizImpl" id="globalBiz"/>
+	<bean class="com.bureau.biz.impl.PubliccarBizImpl" id="publiccarBiz"/>
+	<bean class="com.bureau.biz.impl.CustomerBizImpl" id="customerBiz"/>
+	<bean class="com.bureau.biz.impl.PersionFileBizImpl" id="persionfileBiz"/>
+	<bean class="com.bureau.biz.impl.CarrecordBizImpl" id="carrecordBiz"/>
+	<bean class="com.bureau.biz.impl.GoodsinBizImpl" id="gdBiz"/>
+	<bean class="com.bureau.biz.impl.GoodsoutBizImpl" id="gdoBiz"/>
+	<bean class="com.bureau.biz.impl.LunchBizImpl" id="lchBiz"/>
+	<bean class="com.bureau.biz.impl.DocumentBizImpl" id="documentBiz"/>
+	<bean class="com.bureau.biz.impl.GascarBizImpl" id="gascarBiz"/>
+	<bean class="com.bureau.biz.impl.PaycarBizImpl" id="paycarBiz"/>
+	<bean class="com.bureau.biz.impl.SoftflagBizImpl" id="sfBiz"/>
+	<bean class="com.bureau.biz.impl.UseCarSumBizImpl" id="ucsBiz"/>
+	<bean class="com.bureau.biz.impl.CheckepcarBizImpl" id="ccBiz"/>
+	<bean class="com.bureau.biz.impl.PricarrecordBizImpl" id="pricarrecordBiz"/>
+	<bean class="com.bureau.biz.impl.NewepcarBizImpl" id="newepcarBiz"/>
+	<bean class="com.bureau.biz.impl.ChangeequipmentBizImpl" id="ceBiz"/>
+	<bean class="com.bureau.biz.impl.OldepcarBizImpl" id="oBiz"/>
+	<bean class="com.bureau.biz.impl.ChangeCarSumBizImpl" id="ccsBiz"/>
+	<bean class="com.bureau.biz.impl.MemoBizImpl" id="memoBiz"/>
+	<bean class="com.bureau.biz.impl.RepairBizImpl" id="repairBiz"/>
+	<!-- 配置biz结束 -->
+	
+	<!-- 配置Action开始-->
+	<bean class="com.bureau.action.UserAction" id="userAction" scope="prototype"/>
+	<bean class="com.bureau.action.RoleAction" id="roleAction" scope="prototype"/>
+	<bean class="com.bureau.action.TreeAction" id="treeAction" scope="prototype"/>
+	<bean class="com.bureau.action.ForwardAction" id="forwardAction" scope="prototype"/>
+	<bean class="com.bureau.action.DictionaryAction" id="dictionaryAction" scope="prototype"/>
+	<bean class="com.bureau.action.LogAction" id="logAction" scope="prototype"/>
+	<bean class="com.bureau.action.NoticeAction" id="ncAction" scope="prototype"/>
+	<!-- ********************* -->
+	<bean class="com.bureau.action.PrivatecarAction" id="privatecarAction" scope="prototype"/>
+	<bean class="com.bureau.action.GlobalAction" id="globalAction" scope="prototype"/>
+	<bean class="com.bureau.action.PubliccarAction" id="publiccarAction" scope="prototype"/>
+	<bean class="com.bureau.action.CustomerAction" id="customerAction" scope="prototype"/>
+	<bean class="com.bureau.action.PersionFileAction" id="persionfileAction" scope="prototype"/>
+	<bean class="com.bureau.action.CarrecordAction" id="carrecordAction" scope="prototype"/>
+	<bean class="com.bureau.action.GoodsinAction" id="gdAction" scope="prototype"/>
+	<bean class="com.bureau.action.GoodsoutAction" id="gdoAction" scope="prototype"/>
+	<bean class="com.bureau.action.LunchAction" id="lchAction" scope="prototype"/>
+	<bean class="com.bureau.action.DocumentAction" id="documentAction" scope="prototype"/>
+	<bean class="com.bureau.action.GascarAction" id="gascarAction" scope="prototype"/>
+	<bean class="com.bureau.action.PaycarAction" id="paycarAction" scope="prototype"/>
+	<bean class="com.bureau.action.SoftflagAction" id="sfAction" scope="prototype"/>
+	<bean class="com.bureau.action.UseCarSumAction" id="usecarsumAction" scope="prototype"/>
+	<bean class="com.bureau.action.CheckepcarAction" id="ccAction" scope="prototype"/>
+	<bean class="com.bureau.action.PricarrecordAction" id="pricarrecordAction" scope="prototype"/>
+	<bean class="com.bureau.action.NewepcarAction" id="newepcarAction" scope="prototype"/>
+	<bean class="com.bureau.action.ChangeequipmentAction" id="ceAction" scope="prototype"/>
+	<bean class="com.bureau.action.OldepcarAction" id="oAction" scope="prototype"/>
+	<bean class="com.bureau.action.ChangeCarSumAction" id="changecarsumAction" scope="prototype"/>
+	<bean class="com.bureau.action.MemoAction" id="memoAction" scope="prototype"/>
+	<bean class="com.bureau.action.RepairAction" id="repairAction" scope="prototype"/>
+	<!-- 配置Action结束-->
+	
+</beans>

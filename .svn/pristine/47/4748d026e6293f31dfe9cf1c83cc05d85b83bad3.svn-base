@@ -1,0 +1,128 @@
+package com.bureau.biz.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.ChangeequipmentBiz;
+import com.bureau.dao.ChangeequipmentDao;
+import com.bureau.pojo.Changeequipment;
+import com.bureau.pojo.ChangeequipmentVo;
+import com.bureau.pojo.Checkepcar;
+import com.bureau.pojo.CheckepcarVo;
+import com.bureau.pojo.Customer;
+import com.bureau.pojo.Dictionary;
+import com.bureau.pojo.Notice;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Personfile;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-17 上午9:15:42 
+ * 类说明 
+ */
+public class ChangeequipmentBizImpl implements ChangeequipmentBiz {
+	private ChangeequipmentDao ceDao;
+
+	public void setCeDao(ChangeequipmentDao ceDao) {
+		this.ceDao = ceDao;
+	}
+
+	public PageData<ChangeequipmentVo> findAll(Changeequipment ce) {
+		String hql="from Changeequipment c ";
+		String counthql="select count(c.id) from Changeequipment c";
+		Map<String, Object> params=new HashMap<String, Object>();
+		
+		if(ce.getCarnumber()!=null){
+			hql+=" where c.carnumber like :carnumber";
+			counthql+=" where c.carnumber like :carnumber";
+			params.put("carnumber", "%"+ce.getCarnumber()+"%");
+		}
+		hql+="  order by c.id desc";
+		
+		List<Changeequipment> ces = ceDao.list(hql, params,
+				(ce.getPage()-1)*ce.getRows(),ce.getRows());
+		PageData<ChangeequipmentVo> pd = new PageData<ChangeequipmentVo>();
+		Integer total = ceDao.count(counthql, params);
+		pd.setRows(addEmptyPeople(ces));
+		pd.setTotal(total);
+		return pd;
+	}
+	
+	public List<ChangeequipmentVo> addEmptyPeople(List<Changeequipment> ces){
+		List<ChangeequipmentVo> volist = new ArrayList<ChangeequipmentVo>();
+		for(Changeequipment ce : ces){
+			ChangeequipmentVo vo = new ChangeequipmentVo();
+			
+			vo.setId(ce.getId());
+			vo.setCustomer(ce.getCustomer());
+			vo.setCarnumber(ce.getCarnumber());
+			vo.setColor(ce.getColor());
+			vo.setPhone(ce.getPhone());
+			vo.setSim(ce.getSim());
+			vo.setTerminal(ce.getTerminal());
+			vo.setPeople(ce.getPeople());
+			vo.setChangedate(ce.getChangedate());
+			vo.setCartype(ce.getCartype());
+			vo.setNumber(ce.getNumber());
+			vo.setRegisterdate(ce.getRegisterdate());
+			vo.setEndpay(ce.getEndpay());
+			vo.setRemark(ce.getRemark());
+			vo.setCreatetime(ce.getCreatetime());
+			
+			volist.add(vo);
+		}
+		for(ChangeequipmentVo cev : volist){
+			if(cev.getPeople()==null){
+				cev.setPeople(new Personfile());
+			}
+			if(cev.getCustomer()==null){
+				cev.setCustomer(new Customer());
+			}
+			if(cev.getCartype()==null){
+				cev.setCartype(new Dictionary());
+			}
+			//ccv.setCustomer(new Customer());
+		}
+		return volist;
+	}
+
+	public boolean add(Changeequipment ce) {
+		return ceDao.add(ce);
+	}
+	
+	//delete
+	public boolean del(Changeequipment ce) {
+		return ceDao.del(ce);
+	}
+	
+	public Changeequipment findById(Integer id) {
+		return ceDao.get(id);
+	}
+	
+	//update
+	public boolean update(Changeequipment ce) {
+		String hql="update Changeequipment c set c.customer.id=:customerid,c.carnumber=:carnumber,c.color=:color,c.phone=:phone,c.sim=:sim,c.terminal=:terminal,c.people.id=:peopleid,c.changedate=:changedate,c.cartype.id=:cartypeid,c.number=:number,c.registerdate=:registerdate,c.endpay=:endpay,c.remark=:remark where c.id=:id";
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("id",ce.getId());
+		params.put("customerid",ce.getCustomer().getId());
+		params.put("carnumber",ce.getCarnumber());
+		params.put("color",ce.getColor());
+		params.put("phone",ce.getPhone());
+		params.put("sim",ce.getSim());
+		params.put("terminal",ce.getTerminal());
+		params.put("peopleid",ce.getPeople().getId());
+		params.put("changedate",ce.getChangedate());
+		params.put("cartypeid",ce.getCartype().getId());
+		params.put("number",ce.getNumber());
+		params.put("registerdate",ce.getRegisterdate());
+		params.put("endpay",ce.getEndpay());
+		params.put("remark",ce.getRemark());
+		if(ceDao.execute(hql, params)>-1){
+		    return true;
+		}else{
+		    return false;
+		}
+	}
+}

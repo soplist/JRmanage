@@ -1,0 +1,129 @@
+package com.bureau.biz.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bureau.biz.CheckepcarBiz;
+import com.bureau.dao.CheckepcarDao;
+import com.bureau.pojo.Checkepcar;
+import com.bureau.pojo.CheckepcarVo;
+import com.bureau.pojo.Customer;
+import com.bureau.pojo.Notice;
+import com.bureau.pojo.PageData;
+import com.bureau.pojo.Personfile;
+
+/** 
+ * @author 作者 E-mail: 
+ * @version 创建时间：2018-8-13 上午10:04:07 
+ * 类说明 
+ */
+public class CheckepcarBizImpl implements CheckepcarBiz {
+	CheckepcarDao ccDao;
+
+	public void setCcDao(CheckepcarDao ccDao) {
+		this.ccDao = ccDao;
+	}
+	
+	//findAll
+	public PageData<CheckepcarVo> findAll(Checkepcar cc) {
+		String hql="from Checkepcar c ";
+		String counthql="select count(c.id) from Checkepcar c";
+		Map<String, Object> params=new HashMap<String, Object>();
+		/*if(nc.getTitle()!=null){
+			hql+=" where n.title like :title";
+			counthql+=" where n.title like :title";
+			params.put("title", "%"+nc.getTitle()+"%");
+		}*/
+		hql+="  order by c.id desc";
+			
+		List<Checkepcar> ccs = ccDao.list(hql, params,
+		(cc.getPage()-1)*cc.getRows(),cc.getRows());
+		PageData<CheckepcarVo> pd = new PageData<CheckepcarVo>();
+		Integer total = ccDao.count(counthql, params);
+		pd.setRows(addEmptyPeople(ccs));
+		pd.setTotal(total);
+		return pd;
+	}
+	
+	public List<CheckepcarVo> addEmptyPeople(List<Checkepcar> ccs){
+		List<CheckepcarVo> volist = new ArrayList<CheckepcarVo>();
+		for(Checkepcar cc : ccs){
+			CheckepcarVo vo = new CheckepcarVo();
+			
+			vo.setId(cc.getId());
+			vo.setInformadate(cc.getInformadate());
+			vo.setCustomer(cc.getCustomer());
+			vo.setCarnumber(cc.getCarnumber());
+			vo.setPhone(cc.getPhone());
+			vo.setErrorbrief(cc.getErrorbrief());
+			vo.setNumber(cc.getNumber());
+			vo.setPeople(cc.getPeople());
+			vo.setCheckdate(cc.getCheckdate());
+			vo.setResult(cc.getResult());
+			vo.setMan(cc.getMan());
+			vo.setCalldate(cc.getCalldate());
+			vo.setCallbrief(cc.getCallbrief());
+			vo.setIsfinish(cc.getIsfinish());
+			vo.setCreatetime(cc.getCreatetime());
+			vo.setStatus(cc.getStatus());
+			
+			volist.add(vo);
+		}
+		for(CheckepcarVo ccv : volist){
+			if(ccv.getMan()==null){
+				ccv.setMan(new Personfile());
+			}
+			if(ccv.getPeople()==null){
+				ccv.setPeople(new Personfile());
+			}
+			if(ccv.getCustomer()==null){
+				ccv.setCustomer(new Customer());
+			}
+			//ccv.setCustomer(new Customer());
+		}
+		return volist;
+	}
+	//add
+	public boolean add(Checkepcar cc) {
+		return ccDao.add(cc);
+	}
+	
+	public Checkepcar findById(Integer id) {
+		return ccDao.get(id);
+	}
+	
+	//delete
+	public boolean del(Checkepcar cc) {
+		return ccDao.del(cc);
+	}
+	
+	public boolean maintainUpdate(Checkepcar cc){
+		String hql="update Checkepcar c set c.people.id=:peopleid,c.checkdate=:checkdate,c.result=:result,c.status=2 where c.id=:id";
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("peopleid",cc.getPeople().getId());
+		params.put("checkdate",cc.getCheckdate());
+		params.put("result",cc.getResult());
+		params.put("id",cc.getId());
+		if(ccDao.execute(hql, params)>-1){
+		    return true;
+		}else{
+		    return false;
+		}
+	}
+	
+	public boolean returnvisitUpdate(Checkepcar cc){
+		String hql="update Checkepcar c set c.man.id=:manid,c.calldate=:calldate,c.callbrief=:callbrief,c.status=3 where c.id=:id";
+		Map<String, Object> params=new HashMap<String, Object>();
+		params.put("manid",cc.getMan().getId());
+		params.put("calldate",cc.getCalldate());
+		params.put("callbrief",cc.getCallbrief());
+		params.put("id",cc.getId());
+		if(ccDao.execute(hql, params)>-1){
+		    return true;
+		}else{
+		    return false;
+		}
+	}
+}

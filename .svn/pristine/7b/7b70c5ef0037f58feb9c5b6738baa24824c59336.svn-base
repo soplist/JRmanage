@@ -1,0 +1,84 @@
+package com.bureau.pojo;
+
+/**
+ * Paycar entity. @author MyEclipse Persistence Tools
+ */
+
+public class Paycar implements java.io.Serializable {
+
+	// Fields
+
+	private Integer id;
+	private Double money;
+	private String paydate;
+	private Double balance;
+	private Integer carid;
+	private String create;
+
+	// Constructors
+
+	/** default constructor */
+	public Paycar() {
+	}
+
+	/** full constructor */
+	public Paycar(Double money, String paydate, Double balance, Integer carid,
+			String create) {
+		this.money = money;
+		this.paydate = paydate;
+		this.balance = balance;
+		this.carid = carid;
+		this.create = create;
+	}
+
+	// Property accessors
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Double getMoney() {
+		return this.money;
+	}
+
+	public void setMoney(Double money) {
+		this.money = money;
+	}
+
+	public String getPaydate() {
+		return this.paydate;
+	}
+
+	public void setPaydate(String paydate) {
+		this.paydate = paydate;
+	}
+
+	public Double getBalance() {
+		return this.balance;
+	}
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+
+	public Integer getCarid() {
+		return this.carid;
+	}
+
+	public void setCarid(Integer carid) {
+		this.carid = carid;
+	}
+
+	public String getCreate() {
+		return this.create;
+	}
+
+	public void setCreate(String create) {
+		this.create = create;
+	}
+
+}
